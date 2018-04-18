@@ -1,0 +1,564 @@
+<html>
+	<head>
+		<title>CRGE Jon style</title>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	</head>
+	<body>
+		<h2>CRGE Jon style</h2>
+		<table id='content'><tr>
+			<td>
+				<table>
+					<tr><td><button class='yesno' value='0'/></td></tr>
+					<tr><td><button class='yesno' value='1'/></td></tr>
+					<tr><td><button class='yesno' value='2'/></td></tr>
+					<tr><td><button class='yesno' value='3'/></td></tr>
+					<tr><td><button class='yesno' value='4'/></td></tr>
+					<tr><td><button class='yesno' value='5'/></td></tr>
+					<tr><td><button class='yesno' value='6'/></td></tr>
+					<tr><td><button class='yesno' value='7'/></td></tr>
+					<tr><td><button class='yesno' value='8'/></td></tr>
+					<tr><td><button class='yesno' value='9'/></td></tr>
+				</table>
+			</td>
+			<td>
+				<table>
+					<tr><td>
+						<table>
+							<tr><td><button id='newScene'>New scene</button></td></tr>
+							<tr><td><button id='randomEvent'>Random event</button></td></tr>
+						</table>
+					</td></tr>
+					<tr><td id='stageControls'>
+						Scene stage:<br/>
+						<input class='stage' type='radio' name='stage' value='0' checked>Knowledge</input><br/>
+						<input class='stage' type='radio' name='stage' value='1'>Conflict</input><br/>
+						<input class='stage' type='radio' name='stage' value='2'>Ending</input><br/>
+					</td></tr>
+					<tr><td>
+						Surge:<br/>
+						<div style='white-space: nowrap; text-align: center;'>
+							<button id='surgeDown' class='smallButton'>&lt;</button>
+							<button id='surgeReset' class='smallButton'>=</button>
+							<span id='surgeText'>0</span>
+							<button id='surgeUp' class='smallButton'>&gt;</button>
+						<br/>
+							<input type='checkbox' id='usingMythicEvents' value='0' checked>Events: mythic</input>
+						</div>
+					</td></tr>
+				</table>
+			</td>
+			<td>
+				<table width='100%'><tr><td width='100%'>PCs</td><td><button id='rnd_pc'>random</button></td></tr></table>
+				<textarea id='pcList'></textarea>
+			</td>
+			<td>
+				<table width='100%'><tr><td width='100%'>NPCs</td><td><button id='rnd_npc'>random</button></td></tr></table>
+				<textarea id='npcList'></textarea>
+			</td>
+			<td>
+				<table width='100%'><tr><td width='100%'>Threads</td><td><button id='rnd_thread'>random</button></td></tr></table>
+				<textarea id='threadList'></textarea>
+			</td>
+			</tr><tr>
+			<td colspan='5'>
+				<div id='output' height='10'></div>
+			</td>
+		</tr></table>
+
+		<div id='copyright'>Copyright &copy; 2018 Jonathan Heard</div>
+	</body>
+</html>
+
+<style>
+	td
+	{
+		vertical-align: text-top;
+	}
+	button
+	{
+		width: 100%;
+		height: 1.5em;
+		white-space: nowrap;
+	}
+	.smallButton
+	{
+		width: 1.5em;
+	}
+	#content
+	{
+		width: 16em;
+	}
+	#stageControls
+	{
+		height: 7.5em;
+		vertical-align: middle;
+	}
+	#surgeText
+	{
+		font-size: 100%;
+		border: 1px solid;
+		width: 1.5em;
+		display: inline-block;
+		text-align: center;
+	}
+	#output
+	{
+		width: 100%;
+		min-height: 5em;
+		border: 2px inset;
+		background: lightgray;
+	}
+	#pcList, #npcList, #threadList
+	{
+		height: 15.5em;
+		width: 9.5em;
+	}
+	#copyright
+	{
+		margin-top: 1em;
+		font-size: 75%;
+	}
+</style>
+
+<script>
+	var surgeValue = 0;
+
+	var stageChaosTable = [ 7, 5, 3 ];
+
+	var oddsTable = ["Impossible", "No way", "Very unlikely", "Unlikely", "50 / 50", "Somewhat likely", "Likely", "Very likely", "Near sure thing", "Has to be"];
+
+	var answerTable = ["Yes, unexpectedly", "Yes, but", "Yes, and", "Yes", "No", "No, and", "No, but", "No, unexpectedly"];
+
+	var loomTable = [
+		[	[   5,  15,  20,  50, 620, 715, 905],
+			[  15,  45,  60, 150, 660, 745, 915],
+			[  25,  75, 100, 250, 700, 775, 925],
+			[  35, 105, 140, 350, 740, 805, 935],
+			[  50, 150, 200, 500, 800, 850, 950],
+			[  65, 195, 260, 650, 860, 895, 965],
+			[  75, 225, 300, 750, 900, 925, 975],
+			[  85, 255, 340, 850, 940, 955, 985],
+			[  90, 270, 360, 900, 960, 970, 990],
+			[  95, 285, 380, 950, 980, 985, 995]],
+
+		[	[   2,   6,  16,  50, 696, 886, 962],
+			[   6,  18,  48, 150, 728, 898, 966],
+			[  10,  30,  80, 250, 760, 910, 970],
+			[  14,  42, 112, 350, 792, 922, 974],
+			[  20,  60, 160, 500, 840, 940, 980],
+			[  26,  78, 208, 650, 888, 958, 986],
+			[  30,  90, 240, 750, 920, 970, 990],
+			[  34, 102, 272, 850, 952, 982, 994],
+			[  36, 108, 288, 900, 968, 988, 996],
+			[  38, 114, 304, 950, 984, 994, 998]],
+
+		[	[   1,   2,  20,  50, 620, 962, 981],
+			[   3,   6,  60, 150, 660, 966, 983],
+			[   5,  10, 100, 250, 700, 970, 985],
+			[   7,  14, 140, 350, 740, 974, 987],
+			[  10,  20, 200, 500, 800, 980, 990],
+			[  13,  26, 260, 650, 860, 986, 993],
+			[  15,  30, 300, 750, 900, 990, 995],
+			[  17,  34, 340, 850, 940, 994, 997],
+			[  18,  36, 360, 900, 960, 996, 998],
+			[  19,  38, 380, 950, 980, 998, 999]]
+	];
+
+	var unexpectedlyTable = [
+		["Foreshadowing", "Set a thread to be the main thread for the next scene. The current scene should then start wrapping up and heading towards the next scene."],
+		["Tying off", "The main thread resolves or substantially moves forward in this scene by narrative decree. This does not mean that the main thread cannot create follow-up threads."],
+		["To conflict", "The next scene centers on a conflict of your choosing. Set the main elements of the next scene, and start heading toward them in this scene."],
+		["Costume change", "An NPC drastically changes their mind, motivations, alliances, etc. for better or worse. This could be a big story reveal or a simple change of heart."],
+		["Key grip", "Set the location or general elements for the next scene. The current scene should then start wrapping up and heading towards the next scene."],
+		["To knowledge", "The next scene centers on lore or investigation of your choosing. Set the main elements of the next scene, and start heading toward them in this scene."],
+		["Framing", "An NPC (new or pre-existing) or object becomes critical to the main thread."],
+		["Set change", "Scene continues in another location. The current thread remains as much as makes sense."],
+		["Upstaged", "An NPC makes a big move. If the NPC has any motivations, plot vectors, or goals they go into overdrive."],
+		["Pattern change", "The main thread gets modified, drastically. Whatever direction the main thread was heading, make a hard left. Use a generator, such as Rory’s Story Cubes, tarot cards or a random Wikipedia page, as necessary."],
+		["Limelit", "The rest of the scene goes great for the PC’s. Assume that the majority of the questions pertaining to the main thread with regard to the scene are answered in a way that benefits the PC’s."],
+		["Entering the red", "Threat of danger or combat arrives. The premise of the scene gets more dangerous in a way that forces the PC’s to respond by leaving, fighting, or taking their chances."],
+		["To endings", "The next scene resolves or substantially moves forward a thread of your choosing. Set the main elements of the next scene, and start heading toward them in this scene."],
+		["Montage", "The timeframe of the scene changes to a montage of actions set across various scenes to move forward."],
+		["Enter stage left", "A PC or NPC (new or pre-existing) arrives fresh in the scene."],
+		["Cross-stitch", "Choose another thread to be the main thread for the rest of the scene."],
+		["Six degrees", "A meaningful, but not always positive, connection forms between two PC’s and/or NPC’s."]
+	];
+
+	var eventFocusTable = [
+		[7, "Remote", 0], [28, "NPC: action", 1], [35, "NPC: intro", 0], [45, "Thread: forward", 2],
+		[52, "Thread: backward", 2], [55, "Thread: close", 2], [67, "PC: negative", 3],
+		[75, "PC: positive", 3], [83, "Ambiguous", 0], [92, "NPC: negative", 1], [100, "NPC: positive", 1]
+	];
+
+	var eventActionTable = [
+		"Attainment", "Starting", "Neglect", "Fight", "Recruit", "Triumph", "Violate", "Oppose", "Malice",
+		"Communicate", "Persecute", "Increase", "Decrease", "Abandon", "Gratify", "Inquire", "Antagonise",
+		"Move", "Waste", "Truce", "Release", "Befriend", "Judge", "Desert", "Dominate", "Procrastinate",
+		"Praise", "Separate", "Take", "Break", "Heal", "Delay", "Stop", "Lie", "Return", "Immitate",
+		"Struggle", "Inform", "Bestow", "Postpone", "Expose", "Haggle", "Imprison", "Release", "Celebrate",
+		"Develop", "Travel", "Block", "Harm", "Debase", "Overindulge", "Adjourn", "Adversity", "Kill",
+		"Disrupt", "Usurp", "Create", "Betray", "Agree", "Abuse", "Oppress", "Inspect", "Ambush", "Spy", 
+		"Attach", "Carry", "Open", "Carelessness", "Ruin", "Extravagance", "Trick", "Arrive", "Propose",
+		"Divide", "Refuse", "Mistrust", "Deceive", "Cruelty", "Intolerance", "Trust", "Excitement",
+		"Activity", "Assist", "Care", "Negligence", "Passion", "Work hard", "Control", "Attract",
+		"Failure", "Pursue", "Vengeance", "Proceedings", "Dispute", "Punish", "Guide", "Transform",
+		"Overthrow", "Oppress", "Change"
+	];
+
+	var eventSubjectTable =
+	[
+		"Goals", "Dreams", "Environment", "Outside", "Inside", "Reality", "Allies", "Enemies", "Evil",
+		"Good", "Emotions", "Opposition", "War", "Peace", "The innocent", "Love", "The spiritual",
+		"The intellectual", "New ideas", "Joy", "Messages", "Energy", "Balance", "Tension", "Friendship",
+		"The physical", "A project", "Pleasures", "Pain", "Possessions", "Benefits", "Plans", "Lies",
+		"Expectations", "Legal matters", "Bureaucracy", "Business", "A path", "News", "Exterior factors",
+		"Advice", "A plot", "Competition", "Prison", "Illness", "Food", "Attention", "Success",
+		"Failure", "Travel", "Jealousy", "Dispute", "Home", "Investment", "Suffering", "Wishes",
+		"Tactics", "Stalemate", "Randomness", "Misfortune", "Death", "Disruption", "Power", "A burden",
+		"Intrigues", "Fears", "Ambush", "Rumor", "Wounds", "Extravagance", "A representative",
+		"Adversities", "Opulence", "Liberty", "Military", "The mundane", "Trials", "Masses", "Vehicle",
+		"Art", "Victory", "Dispute", "Riches", "Status quo", "Technology", "Hope", "Magic", "Illusions",
+		"Portals", "Danger", "Weapons", "Animals", "Weather", "Elements", "Nature", "The public",
+		"Leadership", "Fame", "Anger", "Information"
+	];
+
+
+	var surgeText = $("#surgeText");
+	var usingMythicEvents = $("#usingMythicEvents");
+	var outputText = $("#output");
+	var pcList = $("#pcList");
+	var npcList = $("#npcList");
+	var threadList = $("#threadList");
+
+	function isEven(num) { return num % 2 == 0; }
+
+	function roll(sides) { return Math.trunc(Math.random() * sides + 1); }
+
+	function getStageIndex() { return $("input[name=stage]:checked").val(); }
+
+	function append30DayCookieExpiration(original)
+	{
+		date = new Date();
+		date.setTime(date.getTime()+(30*24*60*60*1000));
+		return original + "; expires=" + date.toGMTString() + ";";
+	}
+
+	function loadCookies()
+	{
+		var decodedCookie = decodeURIComponent(document.cookie);
+		var ca = decodedCookie.split(';');
+		for(var i = 0; i <ca.length; i++)
+		{
+			var c = ca[i].trim();
+			if (c.indexOf("surge=") == 0)
+			{
+				setSurgeValue(parseInt(c.substring(6, c.length)));
+			}
+			if (c.indexOf("stage=") == 0)
+			{
+				var value = parseInt(c.substring(6, c.length));
+				$("input[name=stage][value=" + value + "]").prop("checked", true);
+			}
+			if (c.indexOf("pcList=") == 0)
+			{
+				pcList.val(c.substring(7, c.length).replace(/\\n/g, "\n"));
+			}
+			if (c.indexOf("npcList=") == 0)
+			{
+				npcList.val(c.substring(8, c.length).replace(/\\n/g, "\n"));
+			}
+			if (c.indexOf("threadList=") == 0)
+			{
+				threadList.val(c.substring(11, c.length).replace(/\\n/g, "\n"));
+			}
+			if (c.indexOf("usingMythicEvents=") == 0)
+			{
+				var value = c.substring(18, c.length);
+				usingMythicEvents.prop("checked", value=="true");
+			}
+		}
+	}
+
+	function initYesnoButtons()
+	{
+		var yesnoButtons = $(".yesno");
+		for (var i = 0; i < yesnoButtons.length; ++i)
+		{
+			$(yesnoButtons[i]).html(oddsTable[i]);
+		}
+	}
+
+	function setSurgeValue(value)
+	{
+		surgeValue = value;
+		surgeText.html(surgeValue);
+		console.log("Surge set to " + surgeValue);
+		console.log("");
+		document.cookie = append30DayCookieExpiration("surge=" + surgeValue);
+	}
+
+	function pickRandomItem(sourceText)
+	{
+		var text = sourceText.val();
+		var text = text.split("\n").filter((val) => val.trim());
+		var result = "none";
+		if (text.length > 0)
+		{
+			result = text[Math.trunc(Math.random() * text.length)];
+		}
+		return result;
+	}
+
+	function pickRandomPc()
+	{
+		return pickRandomItem(pcList);
+	}
+
+	function pickRandomNpc()
+	{
+		return pickRandomItem(npcList);
+	}
+
+	function pickRandomThread()
+	{
+		return pickRandomItem(threadList);
+	}
+
+	function runRandomEvent(forceThread)
+	{
+		if (usingMythicEvents.prop('checked'))
+		{
+			runRandomMythicEvent(forceThread);
+		}
+		else
+		{
+			runRandomCrgeEvent(forceThread);
+		}
+	}
+
+	function runRandomMythicEvent(forceThread)
+	{
+		console.log("::Mythic event::");
+		var theRoll = roll(100);
+		var eventFocus = "Error";
+		var eventFocusType = 0;
+		for (var i = 0; i < eventFocusTable.length; ++i)
+		{
+			if (theRoll <= eventFocusTable[i][0])
+			{
+				eventFocus = eventFocusTable[i][1];
+				eventFocusType = eventFocusTable[i][2];
+				break;
+			}
+		}
+		var eventAction = eventActionTable[roll(100) - 1];
+		var eventSubject = eventSubjectTable[roll(100) - 1];
+		console.log("eventFocus = " + eventFocus);
+		console.log("eventAction = " + eventAction);
+		console.log("eventSubject = " + eventSubject);
+		outputText.append("<b>RANDOM EVENT</b><br/>\n");
+		outputText.append("<b>Focus</b>: " + eventFocus + "<br/>\n");
+		outputText.append("<b>Meaning</b>: " + eventAction + " <i>(of)</i> " + eventSubject + "<br/>\n");
+		if (eventFocusType == 1)
+		{
+			var npc = pickRandomNpc();
+			console.log("npc = " + npc);
+			outputText.append("<b>NPC</b>: " + npc + "<br/>\n");
+		}
+		else if (eventFocusType == 3)
+		{
+			var pc = pickRandomPc();
+			console.log("pc = " + pc);
+			outputText.append("<b>PC</b>: " + pc + "<br/>\n");
+		}
+		if (eventFocusType == 2 || forceThread)
+		{
+			var thread = pickRandomThread();
+			console.log("thread = " + thread);
+			outputText.append("<b>Thread</b>: " + thread + "<br/>\n");
+		}
+	}
+
+	function runRandomCrgeEvent(forceThread)
+	{
+		console.log("::CRGE event::");
+		var theRoll = roll(unexpectedlyTable.length);
+		var event = unexpectedlyTable[theRoll-1];
+		console.log("theRoll = " + theRoll);
+		console.log("event name = " + event[0]);
+		outputText.append("<b>RANDOM EVENT</b><br/>\n");
+		outputText.append("<b>Name</b>: " + event[0] + "<br/>\n");
+		if (forceThread)
+		{
+			var thread = pickRandomThread();
+			console.log("thread = " + thread);
+			outputText.append("<b>Thread</b>: " + thread + "<br/>\n");
+		}
+		outputText.append("<b>Description</b>:<br/>" + event[1] + "<br/>\n");
+	}
+
+	$(function()
+	{
+		loadCookies();
+		initYesnoButtons();
+
+		var prevPcList = pcList.val();
+		pcList.focusout(function()
+		{
+			var value = pcList.val();
+			if (value != prevPcList)
+			{
+				prevPcList = value;
+				document.cookie = append30DayCookieExpiration("pcList=" + value.replace(/\n/g, "\\n"));
+			}
+		});
+
+		var prevNpcList = npcList.val();
+		npcList.focusout(function()
+		{
+			var value = npcList.val();
+			if (value != prevNpcList)
+			{
+				prevNpcList = value;
+				document.cookie = append30DayCookieExpiration("npcList=" + value.replace(/\n/g, "\\n"));
+			}
+		});
+
+		var prevThreadList = threadList.val();
+		threadList.focusout(function()
+		{
+			var value = threadList.val();
+			if (value != prevThreadList)
+			{
+				prevThreadList = value;
+				document.cookie = append30DayCookieExpiration("threadList=" + value.replace(/\n/g, "\\n"));
+			}
+		});
+
+		$("#surgeDown").click(function()
+		{
+			setSurgeValue(surgeValue - 2);
+		});
+
+		$("#surgeReset").click(function()
+		{
+			setSurgeValue(0);
+		});
+
+		$("#surgeUp").click(function()
+		{
+			setSurgeValue(surgeValue + 2);
+		});
+
+		$("input[name=stage]").click(function()
+		{
+			document.cookie = append30DayCookieExpiration("stage=" + getStageIndex());
+		});
+
+		$("#rnd_pc").click(function()
+		{
+			var val = pickRandomPc();
+			console.log("Random pc: " + val);
+			outputText.html("<b>Random PC</b>:<br/>" + val);
+		});
+
+		$("#rnd_npc").click(function()
+		{
+			var val = pickRandomNpc();
+			console.log("Random npc: " + val);
+			outputText.html("<b>Random NPC</b>:<br/>" + val);
+		});
+
+		$("#rnd_thread").click(function()
+		{
+			var val = pickRandomThread();
+			console.log("Random thread: " + val);
+			outputText.html("<b>Random thread</b>:<br/>" + val);
+		});
+
+		$("#newScene").click(function()
+		{
+			console.log("::New scene::");
+			var theRoll = roll(10);
+			var stageChaos = stageChaosTable[getStageIndex()];
+			var rollIsEven = isEven(theRoll);
+			console.log("theRoll = " + theRoll);
+			console.log("stageChaos = " + stageChaos);
+			if (theRoll <= stageChaos && rollIsEven)
+			{
+				console.log("Interrupted scene");
+				outputText.html("<b>Interrupted scene</b><br/><br/>\n");
+				runRandomEvent(true);
+			}
+			else if (theRoll <= stageChaos && !rollIsEven)
+			{
+				console.log("Modified scene");
+				outputText.html("<b>New modified scene</b><br/><br/>\n");
+			}
+			else
+			{
+				console.log("New scene");
+				outputText.html("<b>New scene</b><br/><br/>\n");
+			}
+		});
+
+		$("#randomEvent").click(function()
+		{
+			console.log("");
+			outputText.html("");
+			runRandomEvent();
+		});
+
+		$("#usingMythicEvents").click(function()
+		{
+			
+			document.cookie = append30DayCookieExpiration("usingMythicEvents=" + usingMythicEvents.prop('checked'));
+		});
+
+		$(".yesno").click(function(evt)
+		{
+			outputText.html("");
+			console.log("::Question::");
+			var oddsIndex = $(evt.target).val();
+			var stageIndex = getStageIndex();
+			var answerOdds = loomTable[stageIndex][oddsIndex];
+			var theRoll = roll(1000);
+			var surgedRoll = theRoll + ((theRoll > answerOdds[3]) ? surgeValue : -surgeValue) * 10;
+			var answerIndex = answerOdds.length;
+			for (var i = 0; i < answerOdds.length; ++i)
+			{
+				if (surgedRoll < answerOdds[i])
+				{
+					answerIndex = i;
+					break;
+				}
+			}
+			console.log("oddsIndex = " + oddsIndex);
+			console.log("stageIndex = " + stageIndex);
+			console.log("theRoll = " + theRoll);
+			console.log("surgeValue = " + surgeValue);
+			console.log("surgedRoll = " + surgedRoll);
+			console.log("answerIndex = " + answerIndex);
+			console.log("answer = " + answerTable[answerIndex]);
+			outputText.append("<b>Query</b>: " + oddsTable[oddsIndex] + "<br/>\n");
+			outputText.append("<b>Answer</b>: " + answerTable[answerIndex] + "<br/>\n");
+			console.log("");
+			if (answerIndex == 0 || answerIndex == 7)
+			{
+				outputText.append("<br/>\n");
+				runRandomEvent();
+				console.log("");
+			}
+
+			// surging
+			if (answerIndex == 3 || answerIndex == 4)
+			{
+				setSurgeValue(surgeValue + 2);
+			}
+			else
+			{
+				setSurgeValue(0);
+			}
+		});
+	});
+</script>
