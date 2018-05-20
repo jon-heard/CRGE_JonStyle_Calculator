@@ -557,7 +557,7 @@
 					output.html("<div class='title'>Person</div><hr/>");
 					var heritage = lookup(person_heritages);
 					output.append("<table border='1'>");
-					output.append("<tr><td class='heading'>Name</td><td>" + lookup(person_names_first) + " " + lookup(person_names_last) + " (" + lookup(person_names_alias) + ")</td></tr>");
+					output.append("<tr><td class='heading'>Name</td><td>" + lookup(person_names_first) + " \"" + lookup(person_names_alias) + "\" " + lookup(person_names_last) + "</td></tr>");
 					output.append("<tr><td class='heading'>Gender</td><td>" + lookup(person_genders) + "</td></tr>");
 					output.append("<tr><td class='heading'>Heritage</td><td>" + heritage + "</td></tr>");
 					output.append("<tr><td class='heading'>&nbsp;</td><td></td></tr>");
@@ -624,7 +624,7 @@
 					}
 					else
 					{
-						output.append("<tr><td class='heading'>Name</td><td>" + lookup(person_names_first) + " " + lookup(person_names_last) + " (" + lookup(person_names_alias) + ")</td></tr>");
+						output.append("<tr><td class='heading'>Name</td><td>" + lookup(person_names_first) + " \"" + lookup(person_names_alias) + "\" " + lookup(person_names_last) + "</td></tr>");
 					}
 					output.append("<tr><td class='heading'>Gender</td><td>" + lookup(person_genders) + "</td></tr>");
 					output.append("<tr><td class='heading'>Heritage</td><td>" + heritage + "</td></tr>");
