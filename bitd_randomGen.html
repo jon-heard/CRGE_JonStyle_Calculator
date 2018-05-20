@@ -143,8 +143,8 @@
 			];
 			var person_heritages =
 			[
-				"Akorosi", "Akorosi", "Akorosi", "Akorosi", "Akorosi", "Akorosi",
-				"Skovlander", "Skovlander", "Iruvian", "Dagger Islander", "Severosi", "Tycherosi"
+				"Akorosi (victorian Britain)", "Akorosi (victorian Britain)", "Akorosi (victorian Britain)", "Akorosi (victorian Britain)", "Akorosi (victorian Britain)", "Akorosi (victorian Britain)",
+				"Skovlander (Irish)", "Skovlander (Irish)", "Iruvian (Persian)", "Dagger Islander (carribian/pirate)", "Severosi (African)", "Tycherosi (magical/mysterious)"
 			];
 			var person_styles =
 			[
@@ -555,22 +555,14 @@
 				$("#rnd_person").click(function()
 				{
 					output.html("<div class='title'>Person</div><hr/>");
-					var alias = lookup(person_names_alias);
 					var heritage = lookup(person_heritages);
 					output.append("<table border='1'>");
-					if (alias == "")
-					{
-						output.append("<tr><td class='heading'>Name</td><td>" + lookup(person_names_first) + " " + lookup(person_names_last) + "</td></tr>");
-					}
-					else
-					{
-						output.append("<tr><td class='heading'>Name</td><td>" + lookup(person_names_first) + " " + lookup(person_names_last) + " (" + alias + ")</td></tr>");
-					}
+					output.append("<tr><td class='heading'>Name</td><td>" + lookup(person_names_first) + " " + lookup(person_names_last) + " (" + lookup(person_names_alias) + ")</td></tr>");
 					output.append("<tr><td class='heading'>Gender</td><td>" + lookup(person_genders) + "</td></tr>");
 					output.append("<tr><td class='heading'>Heritage</td><td>" + heritage + "</td></tr>");
 					output.append("<tr><td class='heading'>&nbsp;</td><td></td></tr>");
 
-					if (heritage == "Tycherosi")
+					if (heritage == person_heritages[person_heritages.length-1])
 					{
 						output.append("<tr><td class='heading'>Looks</td><td>" + lookup(person_looks) + ", " + lookup(demon_features) + "</td></tr>");
 					}
@@ -620,7 +612,6 @@
 				$("#rnd_ghost").click(function()
 				{
 					output.html("<div class='title'>Ghost</div><hr/>");
-					var alias = lookup(person_names_alias);
 					var heritage = lookup(person_heritages);
 					output.append("<table border='1'>");
 					output.append("<tr><td class='heading'>Effects</td><td>" + lookup(ghost_effects) + ", " + lookup(ghost_effects) + "</td></tr>");
@@ -631,19 +622,15 @@
 					{	
 						output.append("<tr><td class='heading'>Name</td><td>Unknown</td></tr>");
 					}
-					else if (alias == "")
-					{
-						output.append("<tr><td class='heading'>Name</td><td>" + lookup(person_names_first) + " " + lookup(person_names_last) + "</td></tr>");
-					}
 					else
 					{
-						output.append("<tr><td class='heading'>Name</td><td>" + lookup(person_names_first) + " " + lookup(person_names_last) + " (" + alias + ")</td></tr>");
+						output.append("<tr><td class='heading'>Name</td><td>" + lookup(person_names_first) + " " + lookup(person_names_last) + " (" + lookup(person_names_alias) + ")</td></tr>");
 					}
 					output.append("<tr><td class='heading'>Gender</td><td>" + lookup(person_genders) + "</td></tr>");
 					output.append("<tr><td class='heading'>Heritage</td><td>" + heritage + "</td></tr>");
 					output.append("<tr><td class='heading'>&nbsp;</td><td></td></tr>");
 
-					if (heritage == "Tycherosi")
+					if (heritage == person_heritages[person_heritages.length-1])
 					{
 						output.append("<tr><td class='heading'>Looks</td><td>" + lookup(person_looks) + ", " + lookup(demon_features) + "</td></tr>");
 					}
