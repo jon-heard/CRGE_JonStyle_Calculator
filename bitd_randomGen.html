@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang='en'>
+	<head>
+		<meta charset="UTF-8"/>
+		<title>Blades in the dark - Random generators</title>
+		<style>
+			table
+			{
+				text-align: center;
+			}
+			#output
+			{
+				width: 28em;
+				height: 27em;
+				margin-top: 1em;
+				border: 2px lightgrey inset;
+				background: lightgrey;
+				text-align: left;
+				padding: 0.5em;
+			}
+			.title
+			{
+				font-size: 120%;
+				font-weight: bold;
+			}
+			.heading
+			{
+				font-weight: bold;
+				padding-right: 0.5em;
+			}
+			.indented
+			{
+				padding-left: 2em;
+			}
+		</style>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+		<script>
+			var output;
+
+			var street_moods =
+			[
+				"Dark or Cold", "Bright or Lively", "Quiet or Refined", "Abandoned or Decrepit",
+				"Cramped or Noisy", "Cozy or Warm"
+			];
+			var street_impressions_sights =
+			[
+				"Rain Slick, Oil Slick", "Dancing shadows, Flickering Lights", "Mist, Fog, Frost",
+				"Fleeting Shapes, Echoes in the Ghost Field", "Soot, Ash Clouds, Grime",
+				"Crackling Electricity, Wires, Mechanisms"
+			];
+			var street_impressions_sounds =
+			[
+				"Machinery, Workers", "Fluttering Cloth", "Laughter, Song, Music",
+				"Whispers, Echoes, Strange Voices", "Thunder, Driving Rain", "Bells, clock Chimes, Harbor Horns"
+			];
+			var street_impressions_smells =
+			[
+				"Cook Fires, Furnaces", "Damp Wood, Decay, Refuse", "Animals, Hides, Blood",
+				"Chemicals, Distillates, Fumes", "Rain Water, Ocean", "Ozone, Electroplasmic Discharges"
+			];
+			var street_uses =
+			[
+				["Residential", "Crafts", "Labor", "Shops", "Trade", "Hospitality"],
+				["Residential", "Crafts", "Labor", "Shops", "Trade", "Hospitality"],
+				["Residential", "Crafts", "Labor", "Shops", "Trade", "Hospitality"],
+				["Law, Government", "Public Space", "Power", "Manufacture", "Transportation", "Leisure"],
+				["Law, Government", "Public Space", "Power", "Manufacture", "Transportation", "Leisure"],
+				["Vice", "Entertainment", "Storage", "Cultivation", "Academic", "Artists"]
+			];
+			var street_types =
+			[
+				["Narrow Lane", "Tight Alley", "Twisting Street", "Rough Road", "Bridge", "Waterway"],
+				["Narrow Lane", "Tight Alley", "Twisting Street", "Rough Road", "Bridge", "Waterway"],
+				["Narrow Lane", "Tight Alley", "Twisting Street", "Rough Road", "Bridge", "Waterway"],
+				["Closed Court", "Open Plaza", "Paved Avenue", "Tunnel", "Wide Boulevard", "Roundabout"],
+				["Closed Court", "Open Plaza", "Paved Avenue", "Tunnel", "Wide Boulevard", "Roundabout"],
+				["Elevated", "Flooded", "Suspended", "Subterranean", "Floating", "Private, Gated"]
+			];
+			var street_details =
+			[
+				["Metal Supports", "Ironwork Gates, Fences", "belching Chimneys", "Metal Grates, Hathes, Doors", "Clockwork Mechanisms", "Rigging, Cables"],
+				["Stairs, Ramps, Terraces", "Wooden Scaffolds", "Skyways", "Rooftop Spaces", "Rails, Train Cars", "Hidden Passages"],
+				["Banners, Pennants", "Festival Decorations", "Crowd, Parade, Riot", "Street Performers", "Makeshift Stalls, Shelters", "Crisscrossing Routes"],
+				["Gang Markings", "Patrol Posts", "Lookouts", "Stocks, Public Punishment", "Street Crier, Visionary", "News Stand, Public Notices"],
+				["Stray Animals", "Landscaping", "Muck, Mire", "Construction, Demolition", "Foul Runoff, Fumes, Smoke", "Orphans, Beggars"],
+				["Ancient Ruin", "Leering Gargoyles", "Spirit Chimes, Wards", "Eerie Emptiness", "Quarantine, Lockdown", "Shrine Offerings"]
+			];
+			var props_out =
+			[
+				["Nets, Ropes", "Crates, Boxes", "Cables, Chains", "Drain Pipes", "Water Pump", "Oil Drums"],
+				["Brick Pile", "Iron Bars", "Wooden Boards", "Cut Stones", "Loose Rocks", "Cement Buckets"],
+				["Sewer Grate", "Rotting Refuse", "Mud Puddles", "Discarded Junk", "Carrion & Crows", "Sodden Trash"],
+				["Carriages", "Push Carts", "Moored Boats", "Cargo Barge", "Gondolas", "Wagons"],
+				["Crane & Pulleys", "Cargo Bales", "Metal Ingots", "Industrial Forge", "Coal / Fuel", "waste Bins"],
+				["Street Lamps", "Electric Wires", "Junction Boxes", "Spotlight Tower", "Clock Tower", "Messenger Post"],
+				["Withered Trees", "Monument", "Fountain", "Mossy Ruin", "Collapsed Building", "Flimsy Hovel"],
+				["Barricade", "Gate", "Checkpoint", "Piled Rubble", "Canal Lock", "Lightning Barrier"],
+				["Food Stall", "Vendor Stall", "Barrels, Casks", "Makeshift Shrine", "News Stand", "Stockade"]
+			];
+			var building_exterior_materials =
+			[
+				"Gray Brick", "Stone & Timbers", "Cut Stone Blocks", "Wooden Boards", "Plaster Board & Timbers",
+				"Metal Sheeting"
+			];
+			var building_exterior_details =
+			[
+				"Tile Work", "Iron Work", "Glass Work", "Stone Work", "Wood Work", "Landscaping"
+			];
+			var building_uses_common =
+			[
+				["Bunk House", "Inn", "Tavern", "Gambling Hall", "Drug Den", "Brothel"],
+				["Market", "Workshop", "Bakery", "Butchery", "Forge", "Tailory"],
+				["Work House", "Goat Stables", "Brewery", "Watch Post", "Court, Jail", "Dock"],
+				["Ruin", "Row Houses", "Tenements", "Apartment Building", "Small House", "Bath House"],
+				["Shrine", "Tattoist", "Physiker", "Fighting Pits", "Square Fountain", "Grotto"],
+				["Warehouse", "Stockyard", "Factory", "Refinery", "Eelery", "Mushroom Garden"]
+			];
+			var building_uses_rare =
+			[
+				["Market House", "Restaurant", "Bar, Lounge", "Academy", "Salon", "Cafe"],
+				["Floristry", "Tobaconnist", "Book Shop", "Jeweler", "Clothier", "Gallery"],
+				["Apothecary", "Horse Stables", "Distilery", "Vintner", "Master Artison", "Boat House"],
+				["Theater", "Opera House", "Apartment Building", "Townhouse", "Manor House", "Villa"],
+				["Clinic", "Temple", "Cistern", "Watch Post", "Park", "Monument",],
+				["Archive", "Spiritualist", "Bank", "Alchemist", "Power Plant", "Radiant Energy Garden"]
+			];
+			var building_details =
+			[
+				["Dripping Water", "Creaking Floorboards", "Roaring Fires", "Smoky Lamps", "Buzzing Electric Lights", "Ticking Clockworks"],
+				["Plants, Flowers", "Wall Hangings, Artwork", "Shuttered Windows", "Heavy Curtains, Thick Carpet", "Dust, Detritus", "Wear, Damage"],
+				["Threadbare, Tattered", "Utilitarian Furnishings", "Elegant Finery", "Lush, Comfortable", "Rough-Spun Simplicity", "Spartan Austerity"],
+				["Circular Stairs, Ladders", "Secret Doors", "Catwalks", "Skylights", "Balcony", "Cellar"],
+				["Drafty, Cold", "Stout, Quiet", "Cozy, Warm", "Vaulted, Spacious", "Low, Cramped", "Rickety, Ramshackle"],
+				["Strange Devices", "Wierd Artifacts", "Spirit Wards, Old Runes", "Piled Jumble of Curios", "Antique Appointments", "Shrine, Altar"]
+			];
+			var props_in =
+			[
+				["Chalkboard, Desks, Papers", "Maps, Charts, Diagrams", "Books, Scrolls, Bookcases", "Lamp, Inkwell, Writing Desk", "Clock, Cabinet, Shelves", "Table, Chairs, Notebooks"],
+				["Bed, Bureau, Vanity", "Bunks, Stools, Trunks", "Basin, Pitcher, Mirror", "Sofa, Divan, Music Box", "Couches, Table, Lamps", "Drapery, Pillows, Cushions"],
+				["Counter, Sink, Cabinets", "Cookfire, Pots, Pans, Utensils", "Dining Table, Chairs, Cutlery", "game Board, Cards, Dice", "Larder, Spices, Meat Hooks", "Wine, Beer, Whisky"],
+				["Pedestal, Statue, Paintings", "Bird Cage, Quill, Diary", "Bell, Book, Candle", "Fireplace, Rug, Armchair", "Curtains, Vases, Flowers", "Instruments, Music Sheets"],
+				["Exam Chair, Medical Tools", "Burner, Vials, Beakers", "Workbench, Tools, Rags", "Weapons, Ammunition"]
+			];
+			var person_heritages =
+			[
+				"Akorosi", "Akorosi", "Akorosi", "Akorosi", "Akorosi", "Akorosi",
+				"Skovlander", "Skovlander", "Iruvian", "Dagger Islander", "Severosi", "Tycherosi"
+			];
+			var person_styles =
+			[
+				"Tricorn Hat", "Long Coat", "Hood & Veil", "Short Cloak", "Knit Cap", "Slim Jacket",
+				"Hooded Coat", "Tall Boots", "Work Boots", "Mask & Robes", "Suit & Vest", "Collard Shirt",
+				"Suspenders", "Rough Tunic", "Skirt & Blouse", "Wide Belt", "Fitted Dress", "Heavy Cloak",
+				"Thick Greatcoat", "Soft Boots", "Loose Silks", "Sharp Trousers", "Waxed Coat", "Long Scarf",
+				"Leathers", "Eelskin Bodysuit", "Hide & Furs", "Uniform", "Fitted Leggings", "Apron",
+				"Heavy Gloves", "Face Mask", "Tool Belt", "Crutches", "Cane", "Wheelchair"
+			]
+			var person_genders =
+			[
+				"Man", "Man", "Man", "Man",
+				"Woman", "Woman", "Woman", "Woman",
+				"Ambiguous, Concealed"
+			];
+			var person_looks =
+			[
+				["Large", "Lovely", "weathered", "Chiseled", "Handsome", "Athletic"],
+				["Slim", "Dark", "Fair", "Stout", "Delicate", "Scarred"],
+				["Bony", "Worn", "Rough", "Plump", "Wiry", "Striking"],
+				["Short", "Tall", "Sexy", "Wild", "Elegant", "Stooped"],
+				["Cute", "Plain", "Old", "Young", "Stylish", "Strange"],
+				["Disfigured, Maimed", "Glasses, Monocle", "Prosthetic, Crippled", "Long Hair, Beard, Wig", "Shorn, Bald", "Tattooed"]
+			];
+			var person_goals =
+			[
+				["Wealth", "Power", "Authority", "Prestige, Fame", "Control", "Knowledge"],
+				["Pleasure", "Revenge", "Freedom", "Achievement", "Happiness", "Infamy, Fear"],
+				["Respect", "Love", "Change", "Chaos, Destruction", "Justice", "Cooperation"]
+			];
+			var person_methods =
+			[
+				["Violence", "Threats", "Negotiation", "Study", "Manipulation", "Strategy"],
+				["Theft", "Arcane", "Commerce", "Hard Work", "Law, Politics", "Sabotage"],
+				["Subterfuge", "Alchemy", "Blackmail", "Teamwork", "Espionage", "Chaos"]
+			];
+			var person_professions_common =
+			[
+				["Baker", "Barber", "Blacksmith", "Brewer", "Butcher", "Carpenter"],
+				["Cartwright", "Chandler", "Clerk", "Cobbler", "Cooper", "Cultivator"],
+				["Driver", "Dyer", "Embroiderer", "Fishmonger", "Gondolier", "Guard"],
+				["Leatherworker", "Mason", "Merchant", "Roofer", "Ropemaker", "Rug maker"],
+				["Servant", "Shipwright", "Criminal", "Tailor", "Tanner", "Tinkerer"],
+				["Vendor", "Weaver", "Woodworker", "Goat Herd", "Messenger", "Sailor"]
+			];
+			var person_professions_rare =
+			[
+				["Advocate", "Architect", "Artist", "Author", "Bailiff", "Apiarist"],
+				["Banker", "Bounty Hunter", "Clockmaker", "Courtesan", "Furrier", "Glass Blower"],
+				["Diplomant", "Jailer", "Jeweler", "Leech", "Locksmith", "Magistrate"],
+				["Musician", "Physicker", "Plumber", "Printer", "Scholar", "Scribe"],
+				["Sparkwright", "Tax Collector", "Treasurer", "Whisper", "Composer", "Steward"],
+				["Captain", "Spirit Warden", "Journalist", "Explorer", "Rail Jack", "Soldier"]
+			];
+			var person_traits =
+			[
+				["Charming", "Cold", "Cavalier", "Brash", "Suspicious", "Shrewd"],
+				["Shrewd", "Quiet", "Moody", "Fierce", "Careless", "Secretive"],
+				["Ruthless", "Calculating", "Defiant", "Gracious", "Insightful", "Dishonest"],
+				["Patient", "Vicious", "Sophisticated", "Paranoid", "Enthusiastic", "Elitist"],
+				["Savage", "Cooperative", "Arrogant", "Confident", "Vain", "Daring"],
+				["Volatile", "Candid", "Subtle", "Melancholy", "Enigmatic", "Calm"]
+			];
+			var person_interests =
+			[
+				["Fine whiskey, wine, beer", "Fine food, restaurants", "Fine clothes, jewelry, furs", "Fine arts, opera, theater", "Painting, drawing, sculpture", "History, legends"],
+				["Architecture, furnishings", "Poetry, novels, writing", "Pit-fighting, duels", "Forgotten gods", "Church of Ecstasy", "Path of Echoes"],
+				["Weeping Lady, charity", "Antiques, artifacts, curios", "Horses, riding", "Gadgets, new technology", "Weapons collector", "Mysic instruments, dance"],
+				["Hunting, shooting", "Cooking, gardening", "Gambling, cards, dice", "Natural philosophy", "Drugs, essences, tobacco", "Lovers, romance, trysts"],
+				["Parties, social events", "Exploration, adventure", "Pets (birds,dogs, cats)", "Craft (leatherwork, etc.)", "Ships, boating", "Politics, journalism"],
+				["Arcane books, rituals", "Spectrology, electroplasm", "Alchemy, medicine", "Essences, alchemy", "Demon lore, legends", "Pre-cataclysm legends"]
+			];
+			var person_quirks =
+			[
+				[
+					"Superstitious, Believes in signs, magic numbers.",
+					"Devoted to their family.",
+					"Married into important / powerful family.",
+					"Holds their position to spy for another faction.",
+					"Reclusive.  Prefers to interact via messengers.",
+					"Massive debts (to banks / criminals / famkly)"
+				],
+				[
+					"Blind to flaws in friends, allies, family, etc.",
+					"Once hollowed, then restored.  Immune to spirits.",
+					"Has chronic illness that requires frequent care.",
+					"Secretly (openly?) controlled by possessing spirit.",
+					"Serves a demon's agenda (knowingly or not).",
+					"Proud of heritage, traditions, native language."
+				],
+				[
+					"Concerned with appearances, gossip, peers.",
+					"Drug / alcohol abuser.  Often impaired by their vice.",
+					"Holds their position due to blackmail.",
+					"Relies on council to make decisions.",
+					"Involved with war crimes from the Unity War",
+					"Leads a double life using cover identity."
+				],
+				[
+					"Black sheep / outcast from family or organization.",
+					"In prison or under noble's house arrest.",
+					"Well-traveled. Connections outside Doskvol.",
+					"Revolutionary.  Plots against the Imperium.",
+					"Inherited their position.  May not deserve / want it.",
+					"Celebrity.  Popularized in print / song / theater."
+				],
+				[
+					"Scandalous reputation (deserved or not).",
+					"Surrounded by sycophants, supplicants, toadies.",
+					"Spotless reputation.  Highly regarded.",
+					"Bigoted against culture / belief / social class.",
+					"Visionary.  Holds radical views for future.",
+					"Cursed, haunted, harassed by spirits or demon."
+				],
+				[
+					"Intense, unreasonable phobia or loathing.",
+					"Extensive education on every scholarly subject.",
+					"Keeps detailed journals, notes, records, ledgers.",
+					"Is blindly faithful to an ideal, group, or tradition.",
+					"Deeply traditional.  Opposed to new ideas.",
+					"A fraud.  Some important aspect is fabricated."
+				]
+			];
+			var person_names_first =
+			[
+				"Aldric", "Aldo", "Amosen", "Andrel", "Arden", "Arlyn", "Arquo", "Arvus", "Ashlyn", "Branon",
+				"Brace", "Brance", "Brena", "Bricks", "Candra", "Carissa", "Carro", "Casslyn", "Cavelle",
+				"Clave", "Corille", "Cross", "Crowl", "Cyrene", "Daphnia", "Drav", "Edlun", "Emeline", "Grine",
+				"Helles", "Hix", "Holtz", "Kamelin", "Kelyr", "Kobb", "Kristov", "Laudius", "Lauria", "Lenia",
+				"Lizete", "Lorette", "Lucella", "Lynthia", "Mara", "Milos", "Morlan", "Myre", "Narcus",
+				"Naria", "Noggs", "Odrienne", "Orlan", "Phin", "Polonia", "Quess", "Remira", "Ring", "Roethe",
+				"Sesereth", "Sethla", "Skannon", "Stavrul", "Stev", "Syra", "Talitha", "Tesslyn", "Thena",
+				"Timoth", "Tocker", "Una", "Vaurin", "Veleris", "Veretta", "Vestine", "Vey", "Volette", "Vond",
+				"Weaver", "Wester", "Zamira"
+			];
+			var person_names_last =
+			[
+				"Ankhayat", "Arran", "Athanoch", "Basran", "Boden", "Booker", "Bowman", "Breakiron", "Brogan",
+				"Clelland", "Clermont", "Coleburn", "Comber", "Daava", "Dalmore", "Danfield", "Dunvil",
+				"Farros", "Grine", "Haig", "Helker", "Helles", "Hellyers", "Jayan", "Jeduin", "Kardera",
+				"Karstas", "Keel", "Kessarin", "Kinclaith", "Lomond", "Maroden", "Michter","Morriston",
+				"Penderyn", "Prichard", "Rowan", "Sevoy", "Skelkallan", "Skora", "Slane", "Strangford",
+				"Strathmill", "Templeton", "Tyrconnell", "Vale", "Walund", "Welker"
+			];
+			var person_names_alias =
+			[
+				"Bell", "Birch", "Bricks", "Bug", "Chime", "Coil", "Cricket", "Cross","Crow", "Echo", "Flint",
+				"Frog", "Frost", "Grip", "Gunner", "Hammer", "Hook", "Junker", "Mist", "Moon", "Nail",
+				"Needle", "Ogre", "Pool", "Ring", "Ruby", "Silver", "Skinner", "Song", "Spur", "Tackle",
+				"Thistle", "Thorn", "Tick-Tock", "Twelves", "Vixen", "Whip", "Wicker"
+			];
+			var score_targets =
+			[
+				["Academic or Scholar", "Laborer or Tradesman", "Courier or Sailor", "Merchant or Shopkeeper", "Artist or Writer", "Doctor or Alchemist"],
+				["Drug Dealer or Supplier", "Mercenary or Thug", "Fence or Gambler", "Spy or Informant", "Smuggler or Thief", "Crime Boss"],
+				["Noble or Official", "Banker or Captain", "Revolutionary or Refugee", "Clergy or Cultist", "Constable or Inspector", "Magistrate or Ward Boss"],
+				["Ghost", "Occult Collector", "Vampire or Other Undead", "Demon (disguised)", "Possessed or Hollow", "Whisper or Cultist"],
+			];
+			var score_jobs =
+			[
+				["Stalking or Surveillance", "Sabotage or Arson", "Lift or Plant", "Poison or Arrange Accident", "Burglary or Heist", "Impersonate or Misdirect"],
+				["Assassinate", "Disappear or Ransom", "Terrorize or Extort", "Destroy or Deface", "Raid or Defend", "Rob or Strong-arm"],
+				["Escort or Security", "Smuggle or Courier", "Blackmail or Discredit", "Con or Espionage", "Locate or Hide", "Negotiate or Threaten"],
+				["Curse or Sanctify", "Banish or Summon", "Extract Essence", "Place or Remove Runes", "Perform / Stop Ritual", "Hollow or Revivify"],
+			];
+			var score_twists =
+			[
+				[
+					"An element is a cover for heretic spirit cult praactices",
+					"An occultist has foreseen this job and warned the parties involved",
+					"Rogue spirits possess some/most/all of the people involved",
+					"Rogue spirits haunt the location",
+					"The job furthers a demon's secret agenda",
+					"The job futhers a vampire's secret agenda"
+				],
+				[
+					"An element is a front for a criminal enterprise",
+					"A dangerous gang uses the location",
+					"The job is a trap laid by your enemies",
+					"The job is a test for another job",
+					"The job furthers a merchant lord's secret agenda",
+					"The job furthers a crime boss's secret agenda"
+				],
+				[
+					"The job requires travel by electro-rail",
+					"Must visit the deathlands to do the job",
+					"The job requires sea travel",
+					"The location moves around (site changes, on a vehicle, etc)",
+					"The job furthers a revolutionary's secret agenda",
+					"The job furthers a city official's secret agenda"
+				],
+			];
+			var score_connections =
+			[
+				"PC friend", "PC rival", "PC vice purveyor", "Crew contact", "Doskvol notable",
+				"Ghost, demon, god"
+			];
+			var score_factions =
+			[
+				"Lampblacks or Iron Nails", "Red sashes or NOC", "Crows", "Bluecoats / inspectors",
+				"Spirit wardens"
+			];
+			var ghost_traits =
+			[
+				["Jealous", "Desperate", "Violent", "Hysterical", "Skittish", "Fleeting"],
+				["Curious", "Deceptive", "Clever", "Probing", "Knowledgeable", "Charming"],
+				["Prophetic", "Insightful", "True", "Revelatory", "Guiding", "Instructive"],
+				["Reactive", "Territorial", "Dominant", "Insistent", "Bold", "Demanding"],
+				["Angry", "Volatile", "Aggressive", "Wild", "Savage", "Vengeful"],
+				["Mad", "Chaotic", "Bizarre", "Destructive", "Insane", "Vile"],
+			];
+			var ghost_effects =
+			[
+				["Frost, Chill", "Cold wind", "Faint visions of the local past", "Electrical discharge", "Weird shadows", "Faint echoes"],
+				["Mist, Fog", "Rushing wind", "Intense visual echoes", "Intense magnetism", "Disturbing shadows", "Thunderous sounds"],
+				["Freezing fog", "Storm winds", "Pitch darkness", "Lightning", "Clutching shadows", "Voices in your head"],
+			];
+			var demon_names =
+			[
+				"Korvaeth", "Sevraxis", "Argaz", "Zalvroxos", "Kethtera", "Arkeveron", "Ixis", "Kyronax",
+				"Voldranai", "Esketra", "Ardranax", "Kylastra", "Oryxus", "Ahazu", "Tyraxis", "Azarax",
+				"Vaskari",
+			];
+			var demon_features =
+			[
+				"Black shark eyes", "Scales (type?)", "Razor-sharp claws", "Bony protrusions", "Multiple eyes",
+				"Lashing tail", "Leathery wings", "Spines", "Dripping ichor", "Glowing eyes or markings",
+				"Fur", "Weird Hair (drifting, burning, etc)", "Feathers", "Multiple arms", "Tentacles",
+				"Hard shell, metallic plate", "Lights dim or flare", "Plants wither or grow",
+				"Mechanisms grind to a halt", "Liquid freezes, boils, turns to blood or ashes"
+			];
+			var demon_aspects =
+			[
+				"Humanoid (bestial or Elemental features)",
+				"Humanoid (bestial or Elemental features)",
+				"Humanoid (bestial or Elemental features)",
+				"Animal", "Monstrous", "Amorphous"
+			];
+			var demon_affinities =
+			[
+				"Sea, Water", "Darkness", "Earth, Metal", "Fire, Smoke", "Sky, Stars", "Storm, Wind"
+			];
+			var demon_desires =
+			[
+				["Mayhem", "Murder", "Justice", "Corruption", "Power", "Control"],
+				["Knowledge", "Pleasure", "Suffering", "War", "Revenge", "Chaos"],
+				["Freedom", "Savagery", "Manipulation", "Deception", "Fear", "Achievement"],
+			];
+			var horror_types =
+			[
+				["Reeking Tar", "Writhing Mass", "Radiant Being", "Crystalline Shards", "Creeping Growth", "Animated Stone"],
+				["Cloud of Burning Ash", "Shadow Being", "Swarm of Insects", "Toxic Cloud", "Fiery Being", "Liquid Being"],
+				["Flayed Being", "Shambling Rags", "Freezing Fire", "Impossible Geometry", "Monstrous Animal", "Shimmering Spheres"],
+				["Twisting Machinery", "Psychic Mist", "Throbbing Viscera", "Metallic Being", "Coil of Thorns", "Hypnotic Lights"],
+				["Oozing Slug", "Tremulous Vibrations", "Lashing Hooks", "Skeleton of Black Glass", "Flowing Quicksilver", "Clutching Darkness"],
+				["Floating Octopoid", "Cloying Vapors", "Swirling Mucus", "Serpent Being", "Insectoid Being", "Consuming Orb"],
+			];
+			var god_names =
+			[
+				["The One Within Many", "The Silver Fire", "The Rapturous Chord", "The Fallen Star", "The Lord of the Depths", "The Silent Song"],
+				["The Lady of Thorns", "Our Blood Spilled in Glory", "The Ram", "The Empty Vessel", "The Closed Eye", "The Hand of Sorrow"],
+				["That Which Hungers", "The Thousand Faces", "The Web of Pain", "The Pillars of Night", "The Burned King", "The Father of the Abyss"],
+				["The Forsaken Legion", "The Unbroken Sun", "The Revelation", "The Radiant Word", "The Shrouded Queen", "The Reconciler"],
+				["The Cloud of Woe", "The Broken Circle", "The Conqueror", "She Who Slays in Darkness", "The Dream Beyond Death", "The Blood Dimmed Tide"],
+				["The Guardian of the Gates", "The Maw of the Void", "The Keeper of the Flame", "The Throne of Judgement", "The Lost Crown", "The Golden Stag"],
+			];
+			var god_practices =
+			[
+				[
+					"Sacrifice: Fed to specially consecrated beasts / Savaged (eaten?) by frenzied cult mob.",
+					"Sacrifice: Pitted against an anointed champion in death arena.",
+					"Sacrifice: Ritually bled upon the sacred altar.",
+					"Sacrifice: Progressively overdosed with mind-expanding drugs.",
+					"Sacrifice: Ritually killed and claimed as anointed spirit-champion.",
+					"Sacrifice: Slain by arcane means (electrocuted, spirit shattered, death-cursed)."
+				],
+				[
+					"Congregation: An orgy of pleasure (sex, food, dance, music) and/or pain.",
+					"Congregation: Sacred hymns or prayers for days without ceasing.",
+					"Congregation: Occupying a sacred nexus point during an astrological confluence.",
+					"Congregation: A pilgrimage to a sacred place or being in the deathlands / at sea.",
+					"Congregation: A group vision / dream-quest via essences, drugs, or meditation.",
+					"Congregation: A reenactment / dumb-show of a sacred event."
+				],
+				[
+					"Acquisition: A collection of eyes / hearts / blood from mystics or demons.",
+					"Acquisition: The shards of a shattered sacred object (jewel, sword, skull, stone).",
+					"Acquisition: The original holy writings of the prophet / master / saint.",
+					"Acquisition: The severed body parts (heads, hands, tongues) of heretics or apostates.",
+					"Acquisition: Properties aligned with sacred geometry or attuned by mystical events.",
+					"Acquisition: The ghosts of prophets / mystics / founders / enemies of the order."
+				],
+				[
+					"Destruction: Ritual burning of sacred objects (rune-papers, effigies, flesh, hair).",
+					"Destruction: Ritual eradication of a spirit or demon.",
+					"Destruction: The breaking of the seals that keep the god from this world.",
+					"Destruction: Shattering of ritual objects / altars / temples sacred to an enemy order.",
+					"Destruction: Eradication of weapons / objects / sites / rituals that can harm the god.",
+					"Destruction: Eradication of social / legal / cultural elements that threaten the order."
+				],
+				[
+					"Consecration: Purification by bathing in sacred fluid (blood, wine, milk, oil, etc.).",
+					"Consecration: Purification of the gates that give passage to the god into this world.",
+					"Consecration: Baptism / blessing of an acolyte or object by immersion in spirit well.",
+					"Consecration: Purify / bless cult followers with tattoos / scarification / mutilation.",
+					"Consecration: Creation of blessed idols / artwork / ritual spaces / artifacts.",
+					"Consecration: Wards / runes / spirits bound to shun enemies of the order."
+				],
+				[
+					"Desecration: Debasement or defilement of one sworn to an enemy order.",
+					"Desecration: Corruption of place / object / ritual / tradition to appropriate its power.",
+					"Desecration: Defilement of place / object / ritual to humiliate another order.",
+					"Desecration: Manipulation of authorities / institutions to appropriate their power.",
+					"Desecration: Corruption of acolytes to prepare them for transformation.",
+					"Desecration: Mindless, pointless chaos; sewing the seeds of anarchy."
+				]
+			];
+
+			function roll(sides)
+			{
+				return Math.trunc(Math.random() * sides + 1);
+			}
+
+			var previousLookup;
+			function lookup(table)
+			{
+				var toAvoid = previousLookup;
+				previousLookup = "~~~";	// Avoid checking within recursion
+				var result;
+				if (!Array.isArray(table))
+				{
+					result = table;
+				}
+				else
+				{
+					result = lookup(table[roll(table.length)-1]);
+				}
+				while (result == toAvoid)
+				{
+					result = lookup(table);
+				}
+				if (toAvoid != "~~~")
+				{
+					previousLookup = result;
+				}
+				return result;
+			}
+
+			$(function()
+			{
+				output = $("#output");
+
+				$("#rnd_street").click(function()
+				{
+					output.html("<div class='title'>Street</div><hr/>");
+					output.append("<table border='1'>");
+					output.append("<tr><td class='heading'>Type</td><td>" + lookup(street_types) + "</td></tr>");
+					output.append("<tr><td class='heading'>Use</td><td>" + lookup(street_uses) + "</td></tr>");
+					output.append("<tr><td class='heading'>Mood</td><td>" + lookup(street_moods) + "</td></tr>");
+					output.append("<tr><td class='heading'>Impressions</td><td></td></tr>");
+					output.append("<tr><td class='heading indented'>Sights</td><td>" + lookup(street_impressions_sights) + "</td></tr>");
+					output.append("<tr><td class='heading indented'>Sounds</td><td>" + lookup(street_impressions_sounds) + "</td></tr>");
+					output.append("<tr><td class='heading indented'>Smells</td><td>" + lookup(street_impressions_smells) + "</td></tr>");
+					output.append("<tr><td class='heading'>Details</td><td>" + lookup(street_details) + "</td></tr>");
+					output.append("</table>");
+				});
+				$("#rnd_prop_out").click(function()
+				{
+					output.html("<div class='title'>Prop (outside)</div><hr/>");
+					output.append("<table border='1'>");
+					output.append("<tr><td class='heading'>Docks</td><td>" + lookup(props_out[0]) + "</td></tr>");
+					output.append("<tr><td class='heading'>Construction</td><td>" + lookup(props_out[1]) + "</td></tr>");
+					output.append("<tr><td class='heading'>Sewer</td><td>" + lookup(props_out[2]) + "</td></tr>");
+					output.append("<tr><td class='heading'>Transport</td><td>" + lookup(props_out[3]) + "</td></tr>");
+					output.append("<tr><td class='heading'>Industry</td><td>" + lookup(props_out[4]) + "</td></tr>");
+					output.append("<tr><td class='heading'>Technology</td><td>" + lookup(props_out[5]) + "</td></tr>");
+					output.append("<tr><td class='heading'>Ruins</td><td>" + lookup(props_out[6]) + "</td></tr>");
+					output.append("<tr><td class='heading'>Military</td><td>" + lookup(props_out[7]) + "</td></tr>");
+					output.append("<tr><td class='heading'>Shops</td><td>" + lookup(props_out[8]) + "</td></tr>");
+					output.append("</table>");
+				});
+				$("#rnd_building").click(function()
+				{
+					output.html("<div class='title'>Building</div><hr/>");
+					output.append("<table border='1'>");
+					output.append("<tr><td class='heading'>Usage</td><td></td></tr>");
+					output.append("<tr><td class='heading indented'>Common</td><td>" + lookup(building_uses_common) + "</td></tr>");
+					output.append("<tr><td class='heading indented'>Rare</td><td>" + lookup(building_uses_rare) + "</td></tr>");
+					output.append("<tr><td class='heading'>Exterior</td><td></td></tr>");
+					output.append("<tr><td class='heading indented'>Materials</td><td>" + lookup(building_exterior_materials) + "</td></tr>");
+					output.append("<tr><td class='heading indented'>Details</td><td>" + lookup(building_exterior_details) + "</td></tr>");
+					output.append("<tr><td class='heading'>Interior</td><td></td></tr>");
+					output.append("<tr><td class='heading indented'>Details</td><td>" + lookup(building_details) + "</td></tr>");
+					output.append("</table>");
+				});
+				$("#rnd_prop_in").click(function()
+				{
+					output.html("<div class='title'>Prop (inside)</div><hr/>");
+					output.append("<table border='1'>");
+					output.append("<tr><td class='heading'>Academia</td><td>" + lookup(props_in[0]) + "</td></tr>");
+					output.append("<tr><td class='heading'>Home (base)</td><td>" + lookup(props_in[1]) + "</td></tr>");
+					output.append("<tr><td class='heading'>Home (common)</td><td>" + lookup(props_in[2]) + "</td></tr>");
+					output.append("<tr><td class='heading'>Home (fine)</td><td>" + lookup(props_in[3]) + "</td></tr>");
+					output.append("<tr><td class='heading'>Workshops</td><td>" + lookup(props_in[4]) + "</td></tr>");
+					output.append("</table>");
+				});
+				$("#rnd_person").click(function()
+				{
+					output.html("<div class='title'>Person</div><hr/>");
+					var alias = lookup(person_names_alias);
+					var heritage = lookup(person_heritages);
+					output.append("<table border='1'>");
+					if (alias == "")
+					{
+						output.append("<tr><td class='heading'>Name</td><td>" + lookup(person_names_first) + " " + lookup(person_names_last) + "</td></tr>");
+					}
+					else
+					{
+						output.append("<tr><td class='heading'>Name</td><td>" + lookup(person_names_first) + " " + lookup(person_names_last) + " (" + alias + ")</td></tr>");
+					}
+					output.append("<tr><td class='heading'>Gender</td><td>" + lookup(person_genders) + "</td></tr>");
+					output.append("<tr><td class='heading'>Heritage</td><td>" + heritage + "</td></tr>");
+					output.append("<tr><td class='heading'>&nbsp;</td><td></td></tr>");
+
+					if (heritage == "Tycherosi")
+					{
+						output.append("<tr><td class='heading'>Looks</td><td>" + lookup(person_looks) + ", " + lookup(demon_features) + "</td></tr>");
+					}
+					else
+					{
+						output.append("<tr><td class='heading'>Looks</td><td>" + lookup(person_looks) + "</td></tr>");
+					}
+					output.append("<tr><td class='heading'>Wearing</td><td>" + lookup(person_styles) + ", " + lookup(person_styles) + "</td></tr>");
+					output.append("<tr><td class='heading'>&nbsp;</td><td></td></tr>");
+
+					output.append("<tr><td class='heading'>Traits</td><td>" + lookup(person_traits) + ", " + lookup(person_traits) + "</td></tr>");
+					output.append("<tr><td class='heading'>Goals</td><td>" + lookup(person_goals) + "</td></tr>");
+					output.append("<tr><td class='heading'>Methods</td><td>" + lookup(person_methods) + ", " + lookup(person_methods) + "</td></tr>");
+					output.append("<tr><td class='heading'>&nbsp;</td><td></td></tr>");
+
+					output.append("<tr><td class='heading'>Profession</td><td></td></tr>");
+					output.append("<tr><td class='heading indented'>Common</td><td>" + lookup(person_professions_common) + "</td></tr>");
+					output.append("<tr><td class='heading indented'>Rare</td><td>" + lookup(person_professions_rare) + "</td></tr>");
+					output.append("<tr><td class='heading'>Interest</td><td>" + lookup(person_interests) + "</td></tr>");
+					output.append("<tr><td class='heading'>Quirk</td><td>" + lookup(person_quirks) + "</td></tr>");
+					output.append("</table>");
+				});
+				$("#rnd_score").click(function()
+				{
+					output.html("<div class='title'>Score</div><hr/>");
+					var target = lookup(score_targets);
+					output.append("<table border='1'>");
+					if (target == "Ghost")
+					{
+						while (target == "Ghost")
+						{
+							target = lookup(score_targets);
+						}
+						output.append("<tr><td class='heading'>Target</td><td>Ghost of: " + target + "</td></tr>");
+					}
+					else
+					{
+						output.append("<tr><td class='heading'>Target</td><td>" + target + "</td></tr>");
+					}
+					output.append("<tr><td class='heading'>Work</td><td>" + lookup(score_jobs) + "</td></tr>");
+					output.append("<tr><td class='heading'>Twist</td><td>" + lookup(score_twists) + "</td></tr>");
+					output.append("<tr><td class='heading'>Connections...</td><td></td></tr>");
+					output.append("<tr><td class='heading indented'>Person</td><td>" + lookup(score_connections) + "</td></tr>");
+					output.append("<tr><td class='heading indented'>Faction</td><td>" + lookup(score_factions) + "</td></tr>");
+					output.append("</table>");
+				});
+				$("#rnd_ghost").click(function()
+				{
+					output.html("<div class='title'>Ghost</div><hr/>");
+					var alias = lookup(person_names_alias);
+					var heritage = lookup(person_heritages);
+					output.append("<table border='1'>");
+					output.append("<tr><td class='heading'>Effects</td><td>" + lookup(ghost_effects) + ", " + lookup(ghost_effects) + "</td></tr>");
+					output.append("<tr><td class='heading'>Traits</td><td>" + lookup(ghost_traits) + ", " + lookup(ghost_traits) + "</td></tr>");
+					output.append("<tr><td class='heading'>&nbsp;</td><td></td></tr>");
+
+					if (roll(2) == 1)
+					{	
+						output.append("<tr><td class='heading'>Name</td><td>Unknown</td></tr>");
+					}
+					else if (alias == "")
+					{
+						output.append("<tr><td class='heading'>Name</td><td>" + lookup(person_names_first) + " " + lookup(person_names_last) + "</td></tr>");
+					}
+					else
+					{
+						output.append("<tr><td class='heading'>Name</td><td>" + lookup(person_names_first) + " " + lookup(person_names_last) + " (" + alias + ")</td></tr>");
+					}
+					output.append("<tr><td class='heading'>Gender</td><td>" + lookup(person_genders) + "</td></tr>");
+					output.append("<tr><td class='heading'>Heritage</td><td>" + heritage + "</td></tr>");
+					output.append("<tr><td class='heading'>&nbsp;</td><td></td></tr>");
+
+					if (heritage == "Tycherosi")
+					{
+						output.append("<tr><td class='heading'>Looks</td><td>" + lookup(person_looks) + ", " + lookup(demon_features) + "</td></tr>");
+					}
+					else
+					{
+						output.append("<tr><td class='heading'>Looks</td><td>" + lookup(person_looks) + "</td></tr>");
+					}
+					output.append("<tr><td class='heading'>Wearing</td><td>" + lookup(person_styles) + ", " + lookup(person_styles) + "</td></tr>");
+					output.append("<tr><td class='heading'>&nbsp;</td><td></td></tr>");
+
+					output.append("<tr><td class='heading'>Goals</td><td>" + lookup(person_goals) + "</td></tr>");
+					output.append("<tr><td class='heading'>Methods</td><td>" + lookup(person_methods) + ", " + lookup(person_methods) + "</td></tr>");
+					output.append("<tr><td class='heading'>&nbsp;</td><td></td></tr>");
+
+					output.append("<tr><td class='heading'>Profession</td><td></td></tr>");
+					output.append("<tr><td class='heading indented'>Common</td><td>" + lookup(person_professions_common) + "</td></tr>");
+					output.append("<tr><td class='heading indented'>Rare</td><td>" + lookup(person_professions_rare) + "</td></tr>");
+					output.append("<tr><td class='heading'>Interest</td><td>" + lookup(person_interests) + "</td></tr>");
+					output.append("<tr><td class='heading'>Quirk</td><td>" + lookup(person_quirks) + "</td></tr>");
+					output.append("<tr><td class='heading'>&nbsp;</td><td></td></tr>");
+					output.append("</table>");
+				});
+				$("#rnd_demon").click(function()
+				{
+					output.html("<div class='title'>Demon</div><hr/>");
+					output.append("<table border='1'>");
+					output.append("<tr><td class='heading'>Name</td><td>" + lookup(demon_names) + "</td></tr>");
+					output.append("<tr><td class='heading'>Aspect</td><td>" + lookup(demon_aspects) + "</td></tr>");
+					output.append("<tr><td class='heading'>Affinity</td><td>" + lookup(demon_affinities) + "</td></tr>");
+					output.append("<tr><td class='heading'>Features</td><td>" + lookup(demon_features) + ", " + lookup(demon_features) + ", " + lookup(demon_features) + "</td></tr>");
+					output.append("<tr><td class='heading'>Desires</td><td>" + lookup(demon_desires) + ", " + lookup(demon_desires) + "</td></tr>");
+					output.append("</table>");
+				});
+				$("#rnd_horror").click(function()
+				{
+					output.html("<div class='title'>Horror</div><hr/>");
+					output.append("<table border='1'>");
+					output.append("<tr><td class='heading'>Type</td><td>" + lookup(horror_types) + "</td></tr>");
+					output.append("</table>");
+				});
+				$("#rnd_god").click(function()
+				{
+					output.html("<div class='title'>Forgotten god</div><hr/>");
+					output.append("<table border='1'>");
+					output.append("<tr><td class='heading'>Title</td><td>" + lookup(god_names) + "</td></tr>");
+					output.append("<tr><td class='heading'>rituals:</td><td>" + lookup(god_practices) + "</td></tr>");
+					output.append("<tr><td class='heading indented'></td><td>" + lookup(god_practices) + "</td></tr>");
+					output.append("</table>");
+				});
+			});
+		</script>
+	</head>
+	<body>
+		<table border='0'>
+			<tr><td>
+				<h2>Blades in the dark<br/>Random generators</h2>
+			</td></tr>
+			<tr><td>
+				<button id='rnd_person'>Person</button>
+				<button id='rnd_ghost'>Ghost</button>
+				<button id='rnd_demon'>Demon</button>
+				<button id='rnd_horror'>Horror</button>
+				<button id='rnd_god'>Forgotten god</button>
+				<br/><br/>
+				<button id='rnd_street'>Street</button>
+				<button id='rnd_prop_out'>Prop (outside)</button>
+				<button id='rnd_building'>Building</button>
+				<button id='rnd_prop_in'>Prop (inside)</button>
+				<button id='rnd_score'>Score</button>
+			</td></tr>
+			<tr><td>
+				<div id='output'></div>
+			</td></tr>
+		</table>
+	</body>
+</html>
