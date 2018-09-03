@@ -1,0 +1,6 @@
+- replace end with "level up" with levelup options (and textarea with json char sheet)
+- setup path choices (as separate array)
+- setup a separate steps for path choices
+
+- add questions to select descriptions
+- add descriptions for everything

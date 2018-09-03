@@ -1,0 +1,178 @@
+<!doctype html>
+<html class='maxHeight'>
+	<head>
+		<title>Smallville RPG Chargen</title>
+		<script type='text/javascript' src='libs/jquery-3.3.1.min.js'></script>
+		<script type='text/javascript' src='libs/common.js'></script>
+		<script type='text/javascript' src='libs/statusbar.js'></script>
+		<script type='text/javascript' src='libs/charSheet.js'></script>
+		<script type='text/javascript' src='libs/chargen_data.js'></script>
+		<script type='text/javascript' src='libs/chargen_steps.js'></script>
+		<script type='text/javascript' src='libs/chargen_steps_hs.js'></script>
+		<script type='text/javascript' src='libs/chargen.js'></script>
+		<style type='text/css'>
+			body
+			{
+				margin: 0;
+			}
+			button
+			{
+				margin-right: .25em;
+			}
+			table
+			{
+				display: inline-block;
+				vertical-align: top;
+				margin-right: 2em;
+			}
+			td, th
+			{
+				text-align: left;
+			}
+			h1, h2, h3, h4, h5
+			{
+				margin: .5em 0em;
+			}
+			input
+			{
+				margin-right: 1em;
+			}
+			.maxHeight
+			{
+				height: 100%;
+			}
+			#content
+			{
+				height: calc(100% - 1.5em);
+			}
+			#footer
+			{
+				display: flex;
+			}
+			#input
+			{
+				width: 300px;
+				height: 100%;
+				box-sizing: border-box;
+				display: inline-block;
+				white-space: nowrap;
+    			overflow: auto;
+				resize: none;
+			}
+			#output
+			{
+				width: calc(100% - 300px);
+				height: 100%;
+				box-sizing: border-box;
+				float: right;
+			}
+			#statusbar
+			{
+				box-sizing: border-box;
+				border: 2px lightgrey inset;
+				height: 1.5em;
+				flex-grow: 100;
+			}
+			#chargenQuestion, #charSheet
+			{
+				box-sizing: border-box;
+				border: 1px solid black;
+			}
+			#chargenQuestion
+			{
+				height: 10em;
+				padding: 1em 1em;
+			}
+			#charSheet
+			{
+				padding: 0em 1em;
+				height: calc(100% - 10em);
+				white-space: nowrap;
+    			overflow: auto;
+				resize: none;
+			}
+			#title
+			{
+				font-weight: bold;
+				font-size: 120%;
+				margin-bottom: .5em;
+			}
+			#plotTitle, #growthTitle, .valueTitle, .stressTitle,
+			.relationshipTitle, .resourceTitle, .assetTitle
+			{
+				font-weight: bold;
+			}
+			.valueText, .relationshipText, .resourceUses, .assetLimits
+			{
+				font-style: italic;
+			}
+			.valueDie, .stressDie, .relationshipDie, .resourceDie, .assetDie
+			{
+				padding: 0em 1em;
+				text-align: center;
+			}
+			.assetTitle, .assetDie
+			{
+				width: 0.1%;
+				white-space: nowrap;
+			}
+			.assetEffects
+			{
+				padding-left: 2em;
+				width: 100%;
+			}
+			.stepFocus
+			{
+				font-weight: bold;
+			}
+		</style>
+	</head>
+
+	<body class='maxHeight'>
+		<div id='content'>
+			<textarea id='input'></textarea>
+			<div id='output'>
+				<div id='chargenQuestion'></div>
+				<div id='charSheet'></div>
+			</div>
+		</div>
+		<div id='footer'>
+			<div id='statusbar'>&nbsp;</div>
+		</div>
+	</body>
+</html>
+
+<script type='text/javascript'>
+	var input = $("#input");
+	var chargen = $("#chargenQuestion");
+	var charSheet = $("#charSheet");
+
+
+	$(function()
+	{
+		setStatusbar($("#statusbar"));
+		//input.val(localStorage.getItem("smallvilleChargen_mainData"));
+		refresh();
+	});
+
+	input.keyup(function(key)
+	{
+		//localStorage.setItem("smallvilleChargen_mainData", input.val());
+		refresh();
+	});
+	input.change(function()
+	{
+		setStatus("");
+		var oldSrc= input.val();
+		var newSrc = serializeChargen();
+		if (newSrc != oldSrc)
+		{
+			input.val(newSrc);
+		}
+	});
+
+	function refresh()
+	{
+		genChargen(input.val());
+	}
+</script>

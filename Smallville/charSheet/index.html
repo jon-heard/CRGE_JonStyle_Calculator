@@ -1,0 +1,382 @@
+<!doctype html>
+<html class='maxHeight'>
+	<head>
+		<title>Clark (Smallville)</title>
+		<script type='text/javascript' src='libs/jquery-3.3.1.min.js'></script>
+		<script type='text/javascript' src='libs/common.js'></script>
+		<script type='text/javascript' src='libs/statusbar.js'></script>
+		<script type='text/javascript' src='libs/sheetGen.js'></script>
+		<style type='text/css'>
+			body
+			{
+				margin: 0;
+			}
+			button
+			{
+				margin-right: .25em;
+			}
+			.maxHeight
+			{
+				height: 100%;
+			}
+			#content
+			{
+				height: calc(100% - 1.5em);
+			}
+			#footer
+			{
+				display: flex;
+				padding-left: .25em;
+			}
+			#input
+			{
+				width: 300px;
+				height: 100%;
+				box-sizing: border-box;
+				display: inline-block;
+				white-space: nowrap;
+    			overflow: auto;
+				resize: none;
+			}
+			#output
+			{
+				width: calc(100% - 300px);
+				height: 100%;
+				box-sizing: border-box;
+				float: right;
+				white-space: nowrap;
+    			overflow: auto;
+				resize: none;
+			}
+			#statusbar
+			{
+				box-sizing: border-box;
+				border: 2px lightgrey inset;
+				height: 1.5em;
+				flex-grow: 100;
+				padding: 0em .5em;
+			}
+
+			table
+			{
+				display: inline-block;
+				vertical-align: top;
+				margin-right: 2em;
+			}
+
+			td, th
+			{
+				text-align: left;
+			}
+			th
+			{
+				font-size: 125%;
+			}
+
+			#plotSpace
+			{
+				margin-right: 3em;
+			}
+			#plotValue, #growthValues
+			{
+				margin: 0em .5em;
+			}
+			#plotTitle, #growthTitle, .valueTitle, .stressTitle,
+			.relationshipTitle, .resourceTitle, .assetTitle
+			{
+				font-weight: bold;
+			}
+			.valueText, .relationshipText, .resourceUses, .assetLimits
+			{
+				font-style: italic;
+			}
+			.valueDie, .stressDie, .relationshipDie, .resourceDie, .assetDie
+			{
+				padding: 0em 1em;
+				text-align: center;
+			}
+			.assetTitle, .assetDie
+			{
+				width: 0.1%;
+				white-space: nowrap;
+			}
+			.assetEffects
+			{
+				padding-left: 2em;
+				width: 100%;
+			}
+
+			.poolItem, .growthItem
+			{
+				cursor: pointer;
+			}
+			.poolItem:hover, .growthItem:hover
+			{
+				color: blue;
+				text-decoration: underline;
+			}
+			.poolResult
+			{
+				font-weight: bold;
+			}
+			.poolDetails
+			{
+				color: darkGrey;
+			}
+			.firstPool
+			{
+				background-color: lightgoldenrodyellow;
+			}
+			.poolTotal
+			{
+				font-weight: bold;
+				border: 1px solid black;
+				padding: 0em .5em;
+				margin-right: 1em;
+				background-color: yellow;
+			}
+		</style>
+	</head>
+
+	<body class='maxHeight'>
+		<div id='content'>
+			<textarea id='input'></textarea>
+			<div id='output'></div>
+		</div>
+		<div id='footer'>
+			<button class='addDie' value='4'>D4</button>
+			<button class='addDie' value='6'>D6</button>
+			<button class='addDie' value='8'>D8</button>
+			<button class='addDie' value='10'>D10</button>
+			<button class='addDie' value='12'>D12</button>
+			<button id='rollPool'>Roll</button>
+			<button id='clearPool'>Clear</button>
+			<button id='rollStress'>Stress</button>
+			<div id='statusbar'>&nbsp;</div>
+		</div>
+	</body>
+</html>
+
+<script type='text/javascript'>
+	var input = $("#input");
+	var output = $("#output");
+	var character = {};
+
+	var pools = [];
+	pools.push([]);
+
+	$(function()
+	{
+		setStatusbar($("#statusbar"));
+		$("#refresh").click(function()
+		{
+			refresh(true);
+		});
+		input.val(localStorage.getItem("smallvilleSheet_mainData"));
+		refresh();
+	});
+
+	input.change(function(key)
+	{
+		localStorage.setItem("smallvilleSheet_mainData", input.val());
+		refresh(false);
+	});
+
+	$(".addDie").click(function()
+	{
+		addDieToPool($(this).val(), "custom")
+	});
+
+	$("#rollPool").click(rollPool);
+	
+	$("#rollStress").click(rollStress);
+
+	$("#clearPool").click(function()
+	{
+		clearPool();
+	});
+
+	function incPlot()
+	{
+		character.state.plot++;
+		refreshSource();
+	}
+	function decPlot()
+	{
+		character.state.plot--;
+		if (character.state.plot < 0) { character.state.plot = 0; }
+		refreshSource();
+	}
+	function setStress(stressPool, value)
+	{
+		character.state[stressPool] = value;
+		refreshSource();
+	}
+	function addGrowth()
+	{
+		var pool = curPool();
+		for (var i = 0; i < pool.length; i++)
+		{
+			character.state.growth.push(pool[i].value);
+		}
+		refreshSource();
+	}
+	function decDrive(name)
+	{
+		if (!confirm("Confirm reducing '" + name + "'.")) { return; }
+		if (!character.state.challenges.hasOwnProperty(name))
+		{
+			character.state.challenges[name] = 0;
+		}
+		character.state.challenges[name]++;
+		refreshSource();
+	}
+	function decResource(name)
+	{
+		if (!confirm("Confirm reducing '" + name + "'.")) { return; }
+		if (!character.state.resourceUse.hasOwnProperty(name))
+		{
+			character.state.resourceUse[name] = 0;
+		}
+		character.state.resourceUse[name]++;
+		refreshSource();
+	}
+	function removeGrowth(index)
+	{
+		if (!confirm("Confirm removing D" + character.state.growth[index] + " growth dice.")) { return; }
+		character.state.growth.splice(index, 1);
+		refreshSource();
+	}
+
+	function refreshSource()
+	{
+		input.val(JSON.stringify(character, null, 2));
+		input.trigger("change");
+	}
+
+	function curPool()
+	{
+		return pools[pools.length - 1];
+	}
+
+	function refresh(force)
+	{
+		character = parseInput(input.val());
+		if (character)
+		{
+			generateOutput(character, output, force);
+		}
+	}
+
+	function rollResource(count, value, title)
+	{
+		pools.push([]);
+		for (var i = 0; i < count; i++)
+		{
+			addDieToPool(value, title);
+		}
+		rollPool();
+		pools.pop();
+		setTimeout(restorePoolDisplay, 100);
+	}
+
+	function restorePoolDisplay()
+	{
+		alert("Click when done with resource pool");
+		refreshPoolDisplay();
+	}
+
+	function addDieToPool(value, title)
+	{
+		curPool().push({ value: value, title: title });
+		refreshPoolDisplay();
+	}
+
+	function rollPool()
+	{
+		var pool = curPool();
+		for (var i = 0; i < pool.length; i++)
+		{
+			pool[i].result = Math.floor(Math.random() * pool[i].value + 1);
+		}
+		pool.sort(poolResultCompare);
+		refreshPoolDisplay();
+	}
+
+	function rollStress()
+	{
+		var pool = curPool();
+		for (var i = 0; i < pool.length; i++)
+		{
+			if (!pool[i].hasOwnProperty("result") || pool[i].result != 1)
+			{
+				pool[i].result = Math.floor(Math.random() * pool[i].value + 1);
+			}
+		}
+		pool.sort(poolResultCompare);
+		refreshPoolDisplay();
+	}
+
+	function removeFromPool(index)
+	{
+		curPool().splice(index, 1);
+		refreshPoolDisplay();
+	}
+
+	function clearPool()
+	{
+		pools[pools.length - 1] = [];
+		refreshPoolDisplay();
+	}
+
+	function refreshPoolDisplay()
+	{
+		var pool = curPool();
+		var poolTexts = [];
+		var result = 0;
+		for (var i = 0; i < pool.length; i++)
+		{
+			let text = "<a class='poolItem' onclick='removeFromPool(" + i + ");'>";
+			let hasResult = pool[i].hasOwnProperty("result");
+			if (hasResult)
+			{
+				text += "<span class='poolResult'>" + pool[i].result + "</span><span class='poolDetails'>=";
+			}
+			text += "D" + pool[i].value + " <i>(" + pool[i].title + ")</i>";
+			if (hasResult)
+			{
+				text += "</span>";
+			}
+			if (i < 2 && hasResult)
+			{
+				result += pool[i].result;
+				text = "<span class='firstPool'>" + text + "</span>";
+			}
+			text += "</a>";
+			poolTexts.push(text);
+		}
+		result = result > 0 ? "<span class='poolTotal'>" + result + "</span>" : "";
+		setStatus(result + poolTexts.join(", "));
+	}
+
+	function poolResultCompare(a, b)
+	{
+		let comparison = 0;
+		let resultA = a.hasOwnProperty("result") ? a.result : 0;
+		let resultB = b.hasOwnProperty("result") ? b.result : 0;
+		if (resultA == resultB)
+		{
+			resultA = a.value;
+			resultB = b.value;
+		}
+		if (resultA > resultB)
+		{
+			comparison = -1;
+		}
+		else if (resultB > resultA)
+		{
+			comparison = 1;
+		}
+		return comparison;
+	}
+</script>

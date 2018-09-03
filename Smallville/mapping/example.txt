@@ -1,0 +1,89 @@
+// Settings
+//cfg_physics false
+//cfg_space 200
+//cfg_noteSpace 5
+
+// Leads
+lead Clark
+lead Chloe
+lead Lois
+lead Oliver
+lead Tess
+lead Zod
+note Clark "Played by Jon"
+note Chloe "Played by Becca"
+note Lois "Played by Megha"
+note Oliver "Played by Ben"
+note Tess "Played by Nancy"
+note Zod "Played by Justin"
+biconnect Clark Chloe friends
+biconnect Clark Lois frenemies
+biconnect Clark Oliver friends
+biconnect Clark Tess enemies
+biconnect Clark Zod enemies
+biconnect Chloe Lois friends
+biconnect Chloe Oliver friends
+biconnect Chloe Tess enemies
+biconnect Chloe Zod enemies
+biconnect Lois Oliver friends
+biconnect Lois Tess enemies
+biconnect Lois Zod enemies
+biconnect Oliver Tess enemies
+biconnect Oliver Zod enemies
+biconnect Tess Zod friends
+
+// Characters (non-leads)
+feature Martha
+feature Lex
+extra General
+extra Jor-el
+extra Moira
+extra Faora
+extra "Luthor security"
+
+// Locations
+location "Kent farm"
+location "Army base"
+location "Kandor"
+location "Luthor plaza"
+location "Talon"
+location "Daily planet"
+location "Queen Ind."
+
+// Connections
+connect Martha "Kent farm" home
+connect Clark "Kent farm" home
+connect Martha Clark "Must protect"
+connect Clark Martha "Raised by"
+connect Lois Martha "Campaign mgr"
+connect General Martha friend
+connect General "Army base" "In charge"
+connect Lois "Army base" "Grew up there"
+connect Jor-el Clark "Father"
+connect Jor-el Zod "Sees good in"
+connect Zod Jor-el "ex-friend"
+connect Zod Kandor "Fought for"
+connect Faora Kandor "Fought for"
+connect Faora Zod "Devoted to"
+connect Zod Faora "Loves"
+connect Tess "Luthor security" "On call"
+connect Tess "Luthor plaza" Headquarters
+connect Oliver "Luthor plaza" Influences
+connect Lois General "Raised by"
+connect General Lois "Inspires"
+connect Clark Lex "Saved"
+connect Lex Clark "Fascinated by"
+connect Talon Lois "Home of"
+connect Tess Lex Devoted
+connect Lex Tess Pawn
+connect Lex "Luthor plaza" Owns
+connect Chloe Talon "Lives over"
+connect Lex Talon "Owns"
+connect Talon Lex "Owned by"
+connect Lex "Daily planet" Owns
+connect Chloe "Daily planet" "Interns at"
+connect Chloe Moira "Raised by"
+connect Moira Chloe "Controls"
+connect Oliver "Queen Ind." Owns
+connect "Queen Ind." Oliver "Provides funding"
+biconnect Oliver Lex "Childhood rivals"

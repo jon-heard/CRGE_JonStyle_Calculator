@@ -1,0 +1,216 @@
+{
+  "name": "Clark",
+  "values": {
+    "duty": {
+      "value": 6,
+      "text": "I must fullfill my parent's hopes for me."
+    },
+    "glory": {
+      "value": 4,
+      "text": "The blur gives people hope."
+    },
+    "justice": {
+      "value": 4,
+      "text": "I must protect the innocent."
+    },
+    "love": {
+      "value": 6,
+      "text": "I must safeguard my family and friends."
+    },
+    "power": {
+      "value": 4,
+      "text": "Power corrupts."
+    },
+    "truth": {
+      "value": 6,
+      "text": "The truth is often dangerous."
+    }
+  },
+  "relationships": {
+    "Chloe": {
+      "value": 10,
+      "text": "I need to be there for Chloe."
+    },
+    "Jonathan": {
+      "value": 4,
+      "text": "Jonathan was my moral compass."
+    },
+    "Lana": {
+      "value": 6,
+      "text": "Lana is not the girl I loved in high school."
+    },
+    "Lex": {
+      "value": 6,
+      "text": "Lex can never be trusted."
+    },
+    "Lois": {
+      "value": 12,
+      "text": "I can't tell Lois my secret."
+    },
+    "Martha": {
+      "value": 8,
+      "text": "Martha is my constant supporter."
+    },
+    "Oliver": {
+      "value": 8,
+      "text": "Oliver is reckless."
+    },
+    "Tess": {
+      "value": 6,
+      "text": "Tess knows what she wants."
+    },
+    "Zod": {
+      "value": 6,
+      "text": "There must be good in Zod."
+    }
+  },
+  "resources": {
+    "Crows nest": {
+      "value": 4,
+      "uses": [
+        "protect",
+        "high"
+      ]
+    },
+    "Daily planet": {
+      "value": 4,
+      "uses": [
+        "research",
+        "info"
+      ]
+    },
+    "Fortress of solitude": {
+      "value": 8,
+      "uses": [
+        "traning",
+        "knowledge (Kryptonian)"
+      ]
+    },
+    "Justice society": {
+      "value": 6,
+      "uses": [
+        "assistance",
+        "inspiration"
+      ]
+    },
+    "Kent farm": {
+      "value": 6,
+      "uses": [
+        "comfort",
+        "restoration"
+      ]
+    },
+    "Oliver's team": {
+      "value": 4,
+      "uses": [
+        "brawl",
+        "sneaky"
+      ]
+    },
+    "John Jones": {
+      "value": 6,
+      "uses": [
+        "retrieval",
+        "crime"
+      ]
+    }
+  },
+  "assets": {
+    "Big hearted": {
+      "value": 8,
+      "effects": [
+        "Earn a plot point when you choose to buy someone's sob story.",
+        "Earn a plot point and add a D6 to the trouble pool when you risk yourself to help someone in need."
+      ]
+    },
+    "Guilty": {
+      "value": 8,
+      "effects": [
+        "Earn a plot point and give your opposition a D6 when your guilt stymies or confuses you."
+      ]
+    },
+    "Heat vision": {
+      "value": 6,
+      "effects": [
+        "Spend a plot point to create a wide-angle sweep effect that inflicts Insecure or Afraid stress.",
+        "Spend a plot point to destroy an inanimate object as big as a car.  Spend two plot points for an object as big as a house.",
+        "Spend three plot points for an object as big as a skyscraper or a river."
+      ]
+    },
+    "Impulsive": {
+      "value": 8,
+      "effects": [
+        "Earn a plot point and add a D6 to trouble when you act rashly.",
+        "Earn a plot point when you choose to interfere in a contest."
+      ]
+    },
+    "Invulneratbility": {
+      "value": 10,
+      "effects": [
+        "Spend a plot point to decrease an opponent's injured or exhausted stress pool",
+        "Spend a plot point to recover your Injured or Exhuasted stress."
+      ]
+    },
+    "Kryptonian heritage": {
+      "value": 8,
+      "limits": [
+        "kryptonite",
+        "magic",
+        "red sun"
+      ],
+      "effects": [
+        "Earn a plot point when your abilities are shutdown by green or blue kryptonite or you choose to act on baser instincts under the sway of red kryptonite.",
+        "Add a D6 to the trouble pool to use a special effect from a connected ability you don't have."
+      ]
+    },
+    "Super breath": {
+      "value": 6,
+      "effects": [
+        "Spend a plot point to trap somebody in a sheath of ice.  Your target must win a contest against you to break free.",
+        "Spend a plot point to clear a scene of all dust, smoke, loose debris, or sand."
+      ]
+    },
+    "Super senses (hearing, sight)": {
+      "value": 8,
+      "limits": [
+        "lead (sight)",
+        "sonic (hearing)"
+      ],
+      "effects": [
+        "Spend a plot point to see through objects to find specific people or objects",
+        "Spend a plot point to hear or see into a nearby scene you're not in."
+      ]
+    },
+    "Super speed": {
+      "value": 10,
+      "effects": [
+        "Spend a plot point to join a scene or switch to a new scene regardless of distance.",
+        "Spend a plot point to catch bullets or other missiles out of the air.",
+        "Spend a plot point to run fast enough to cross water as if it were solid ground."
+      ]
+    },
+    "Super strength": {
+      "value": 10,
+      "effects": [
+        "Spend a plot point to perform a fantastic feat of strength.",
+        "Spend a plot point to throw or knock another character out of a scene.",
+        "Spend a plot point to leap a great distance into another scene."
+      ]
+    }
+  },
+  "state": {
+    "afraid": 0,
+    "angry": 0,
+    "exhausted": 0,
+    "injured": 0,
+    "insecure": 0,
+    "plot": 1,
+    "growth": [
+      6,
+      8,
+      4
+    ],
+    "challenges": {},
+    "resourceUse": {}
+  }
+}

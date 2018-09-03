@@ -1,0 +1,158 @@
+<!doctype html>
+<html class='maxHeight'>
+	<head>
+		<title>Smallville RPG mapper</title>
+		<script type='text/javascript' src='libs/jquery-3.3.1.min.js'></script>
+		<script type='text/javascript' src='libs/vis.min.js'></script>
+		<script type='text/javascript' src='libs/common.js'></script>
+		<script type='text/javascript' src='libs/statusbar.js'></script>
+		<script type='text/javascript' src='libs/main_input.js'></script>
+		<script type='text/javascript' src='libs/main_output.js'></script>
+		<style type='text/css'>
+			body
+			{
+				margin: 0;
+			}
+			button
+			{
+				margin-right: .25em;
+			}
+			.maxHeight
+			{
+				height: 100%;
+			}
+			#content
+			{
+				height: calc(100% - 1.5em);
+			}
+			#footer
+			{
+				display: flex;
+			}
+			#input
+			{
+				width: 300px;
+				height: 100%;
+				box-sizing: border-box;
+				display: inline-block;
+				white-space: nowrap;
+    			overflow: auto;
+				resize: none;
+			}
+			#output
+			{
+				width: calc(100% - 300px);
+				height: 100%;
+				box-sizing: border-box;
+				float: right;
+			}
+			#statusbar
+			{
+				box-sizing: border-box;
+				border: 2px lightgrey inset;
+				height: 1.5em;
+				flex-grow: 100;
+			}
+		</style>
+	</head>
+
+	<body class='maxHeight'>
+		<div id='content'>
+			<textarea id='input'></textarea>
+			<div id='output'></div>
+		</div>
+		<div id='footer'>
+			<button id='help'>?</button>
+			<button id='refresh'>!</button>
+			<div id='statusbar'>&nbsp;</div>
+		</div>
+	</body>
+</html>
+
+<script type='text/javascript'>
+	var input = $("#input");
+	var output = $("#output");
+
+	$(function()
+	{
+		setStatusbar($("#statusbar"));
+		$("#help").click(showHelp);
+		$("#refresh").click(function()
+		{
+			refresh(true);
+		});
+		input.val(localStorage.getItem("smallvilleMapper_mainData"));
+		refresh();
+	});
+
+	input.keyup(function(key)
+	{
+		refresh(false);
+		localStorage.setItem("smallvilleMapper_mainData", input.val());
+	});
+
+	function refresh(force)
+	{
+		var data = parseInput(input.val());
+		if (data)
+		{
+			generateOutput(data, output, force);
+		}
+	}
+
+	function showHelp()
+	{
+		let msg = "";
+		msg += "REFERENCE - CHARACTERS    (PAGE 1 / 6)\n";
+		msg += "\n";
+		msg += "lead - Adds a lead character with the given name.\n";
+		msg += "      Example:      lead Clark\n";
+		msg += "feature - Adds a feature character with the given name.\n";
+		msg += "      Example:      feature \"Perry White\"\n";
+		msg += "extra - Adds an extra characte with the given name.\n";
+		msg += "      Example:      extra Doctor\n";
+		alert(msg);
+		msg = "";
+		msg += "REFERENCE - OTHER NODES    (PAGE 2 / 6)\n";
+		msg += "\n";
+		msg += "location - Adds a location with the given name.\n";
+		msg += "      Example:      location \"Daily Planet\"\n";
+		msg += "note - Adds a note to the node with the given name.\n";
+		msg += "      Example:      note Clark \"Played by Ben\"\n";
+		alert(msg);
+		msg = "";
+		msg += "REFERENCE - CONNECTIONS    (PAGE 3 / 6)\n";
+		msg += "\n";
+		msg += "connect - Connects a character/location to another.\n";
+		msg += "      Example:      connect Clark \"Kent farm\"\n";
+		msg += "      Example:      connect Lois \"Daily Planet\" \"Works at\"\n";
+		msg += "biconnect - Connects two characters/locations to each other.\n";
+		msg += "      Example:      biconnect Clark Lois\n";
+		msg += "      Example:      biconnect Clark Lex enemies\n";
+		alert(msg);
+		msg = "";
+		msg += "REFERENCE - CHARACTER TYPES    (PAGE 4 / 6)\n";
+		msg += "\n";
+		msg += "upgrade - Turns an extra into a feature, or a feature into a lead\n";
+		msg += "      Example:      upgrade Lex\n";
+		msg += "downgrade - Turns a lead into a feature, or a feature into an extra\n";
+		msg += "      Example:      downgrade \"Lionel Luthor\"\n";
+		alert(msg);
+		msg = "";
+		msg += "REFERENCE - SYSTEM    (PAGE 5 / 6)\n";
+		msg += "\n";
+		msg += "cfg_physics - Whether graph adjusts to user input (default: true).\n";
+		msg += "      Example:      cfg_physics true\n";
+		msg += "cfg_space - Amount of space between nodes (default 100).\n";
+		msg += "      Example:      cfg_space 250\n";
+		msg += "cfg_noteSpace - How far notes are from map (default 2).\n";
+		msg += "      Example:      cfg_noteSpace 10\n";
+		alert(msg);
+		msg = "";
+		msg += "REFERENCE - MISCELANEOUS    (PAGE 6 / 6)\n";
+		msg += "\n";
+		msg += "// - A line that starts with double-slash is ignored as a comment.\n";
+		msg += "      Example:      // The following lines mark Clark's origin\n";
+		alert(msg);
+	}
+</script>
