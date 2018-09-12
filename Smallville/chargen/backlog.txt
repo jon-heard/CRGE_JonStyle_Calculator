@@ -1,6 +1,15 @@
-- replace end with "level up" with levelup options (and textarea with json char sheet)
-- setup path choices (as separate array)
-- setup a separate steps for path choices
+- commit/push and transfer to computer
+- get in-progress characters worked out (for tonight)
+- setup "undo"
+- add questions for stage options
+- add descriptions for new distinctions
 
-- add questions to select descriptions
+
+- "Choose" to "Pick"
+- replace definite power and duty stepups with just a label to let you know
+- remove "upgrade" type
+- allow overriding the three path options for each stage
+- add hide/show src button onupper left of main pane
+- have answers stop if current matches
+	- make sure bug is resolved with pasting in adding a bunch of spacers
 - add descriptions for everything

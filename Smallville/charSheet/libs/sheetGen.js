@@ -14,6 +14,20 @@ function generateOutput(src, dest, force)
 	var result = "";
 	result += "<h1>" + apos(src.name) + "</h1>\n";
 
+	result += "<table>\n";
+	result += "<tr><td class='dhead'>Appearance</td><td>" + src.appearance + "</td></tr>\n";
+	result += "<tr><td class='dhead'>Background</td><td>" + src.background + "</td></tr>\n";
+	result += "<tr><td class='dhead'>Path</td><td>\n";
+	for (var i = 0; i < src.path.length; i++)
+	{
+		if (i != 0) { result += ", "; }
+		if (i == 3) { result += "<br/>"; }
+		// result += src.path[i].capitalize();
+		// result += " (" + src.pathTitles[i].capitalize() + ")";
+		result += "<b>" + src.pathTitles[i].capitalize() + ":</b> " + src.path[i].capitalize();
+	}
+	result += "</td></tr></table><br/><br/>\n";
+
 	result += "<span id='plotTitle'>Plot:</span><span id='plotValue'>" + src.state.plot + "</span>";
 	result += "<button onClick='incPlot()'>+</button><button onClick='decPlot()'>-</button>";
 	result += "<span id='plotSpace'/>";
@@ -27,9 +41,10 @@ function generateOutput(src, dest, force)
 			src.state.growth[i] + "</a>");
 	}
 	result += "<span id='growthValues'>" + growthText.join(", ") + "</span>";
+	result += "<select id='addGrowthType'><option>4</option><option>6</option><option>8</option><option>10</option><option>12</option></select>";
 	result += "<button onClick='addGrowth()'>+</button>";
 
-	result += "<br/><br/>\n";
+	result += "<br/>\n";
 
 	result += "<table border='0'><tr><th colspan='3'>Values</th></tr>\n";
 	for (var i = 0; i < _values.length; i++)
@@ -61,7 +76,7 @@ function generateOutput(src, dest, force)
 		 }
 		 result += "</select></td></tr>\n";
 	}
-	result += "</table><hr/>\n";
+	result += "</table><br/>\n";
 
 	result += "<table border='0'><tr><th colspan='3'>Relationships</th></tr>\n";
 	for (var name in src.relationships)
@@ -98,28 +113,60 @@ function generateOutput(src, dest, force)
 			result += "<button onclick='decResource(\"" + name + "\")'>-</button>";
 		}
 		result += "</td>";
-		result += "<td class='resourceUses'>" + src.resources[name].uses.join(", ") + "</td></tr>\n";
+		result += "<td class='resourceUses'>" + src.resources[name].specialties.join(", ") + "</td></tr>\n";
 	}
-	result += "</table><hr/>\n";
+	result += "</table><br/>\n";
 
 	result += "<table border='0'><tr><th colspan='3'>Assets</th></tr>\n";
-	for (var name in src.assets)
+	for (var name in src.distinctions)
 	{
-		let limitText =
-			src.assets[name].hasOwnProperty("limits") ?
-			("Limits: " + apos(src.assets[name].limits.join(", "))) :
-			"";
-		result += "<tr><td class='assetTitle'>" + apos(name) + "</td><td class='assetDie'>" + dice(1, src.assets[name].value, apos(name)) + "</td><td class='assetLimits'>" + limitText + "</td></tr>\n";
-		result += "<tr><td class='assetEffects' colspan='3'>\n";
-		for (var i = 0; i < src.assets[name].effects.length; i++)
-		{
-			result += apos(src.assets[name].effects[i]) + "<br/>";
-		}
-		result += "</td></tr>\n";
+		var distinction = src.distinctions[name];
+		result += getAssetUi(name, distinction.value, distinction.limits, distinction.effects);
+	}
+	for (var name in src.abilities)
+	{
+		var ability = src.abilities[name];
+		var effects = ability.effects.map(fixupSpendEffect);
+		result += getAssetUi(name, ability.value, ability.limits, effects);
+	}
+	for (var name in src.gear)
+	{
+		var gear = src.gear[name];
+		var effects = gear.effects.map(fixupSpendEffect);
+		result += getAssetUi(
+			name, gear.value, ["gear"], effects);
 	}
 	result += "</table>\n";
 
 	dest.html(result);
+}
+
+function getAssetUi(name, value, limits, effects)
+{
+	let limitText = isArray(limits) ? "Limits: " + apos(limits.join(", ")) : "";
+	var result = "";
+	result += "<tr><td class='assetTitle'>" + apos(name) + "</td>";
+	result += "<td class='assetDie'>" + dice(1, value, apos(name)) + "</td>";
+	result += "<td class='assetLimits'>" + limitText + "</td></tr>\n";
+	result += "<tr><td colspan='3'>\n";
+	for (var i = 0; i < effects.length; i++)
+	{
+		result += "<div class='effect'>" + apos(effects[i]) + "</div>";
+	}
+	result += "</td></tr>\n";
+	return result;
+}
+
+function fixupSpendEffect(effect)
+{
+	if (effect.startsWith("Spend "))
+	{
+		return effect;
+	}
+	else
+	{
+		return "Spend a plot point to " + effect.uncapitalize();
+	}
 }
 
 function dice(count, type, name)
