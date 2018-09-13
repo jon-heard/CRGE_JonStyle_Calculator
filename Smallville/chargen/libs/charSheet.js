@@ -132,7 +132,8 @@ function resetCharacter()
 
 function serializeCharacter()
 {
-    return jsonStringifyPretty(_character, 2, 2);
+	return JSON.stringify(_character, null, 2);
+	//return jsonStringifyPretty(_character, 2, 2);
 }
 
 function makeSheet()
