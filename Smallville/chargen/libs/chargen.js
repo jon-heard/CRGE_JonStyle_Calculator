@@ -103,7 +103,10 @@ function runNextStep()
 		_preFnc();
 		_getData = function () { return _answers[_currentAnswer - 1].data; }
 		_midFnc(_getData());
-		shiftStep(1, true);
+		if (hasAnswer())
+		{
+			setTimeout(shiftStep, 0, 1, true);
+		}
 		return;
 	}
 
@@ -156,6 +159,7 @@ function runNextStep()
 			}
 			result += "</select><span id='selectDescription'/>";
 			_getData = function () { return $("#chargenSelect").val(); }
+			data = data[0];
 			break;
 		case "select2":
 			if (data == null) { data = [[], []]; }
@@ -172,10 +176,6 @@ function runNextStep()
 			}
 			result += "</select>";
 			_getData = function () { return [$("#chargenSelect_first").val(), $("#chargenSelect_second").val()]; }
-			break;
-		case "spacer":
-		case "goto":
-			//if (isString(data)) { data = "\"" + data + "\""; }
 			break;
 	}
 	if (step.type != "goto" && step.type != "spacer")
@@ -198,7 +198,6 @@ function runNextStep()
 		result += " shiftStep(" + data + ");";
 	}
 	result += "</script>";
-	//return result;
 	chargen.html(result);
 }
 

@@ -229,15 +229,9 @@
 	$(function ()
 	{
 		setStatusbar($("#statusbar"));
-		//input.val(localStorage.getItem("smallvilleChargen_mainData"));
 		refresh();
 	});
 
-	input.keyup(function (key)
-	{
-		//localStorage.setItem("smallvilleChargen_mainData", input.val());
-		refresh();
-	});
 	input.change(function ()
 	{
 		setStatus("");
@@ -245,7 +239,7 @@
 		var newSrc = serializeChargen();
 		if (newSrc != oldSrc)
 		{
-			input.val(newSrc);
+			refresh();
 		}
 	});
 

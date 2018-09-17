@@ -22,14 +22,13 @@ function generateOutput(src, dest, force)
 	{
 		if (i != 0) { result += ", "; }
 		if (i == 3) { result += "<br/>"; }
-		// result += src.path[i].capitalize();
-		// result += " (" + src.pathTitles[i].capitalize() + ")";
 		result += "<b>" + src.pathTitles[i].capitalize() + ":</b> " + src.path[i].capitalize();
 	}
 	result += "</td></tr></table><br/><br/>\n";
 
 	result += "<span id='plotTitle'>Plot:</span><span id='plotValue'>" + src.state.plot + "</span>";
-	result += "<button onClick='incPlot()'>+</button><button onClick='decPlot()'>-</button>";
+	result += "<button onClick='incPlot()'>+</button>";
+	result += "<button class='marginLeft' onClick='decPlot()'>-</button>";
 	result += "<span id='plotSpace'/>";
 
 	result += "<span id='growthTitle'>Growth:</span>";
@@ -42,11 +41,11 @@ function generateOutput(src, dest, force)
 	}
 	result += "<span id='growthValues'>" + growthText.join(", ") + "</span>";
 	result += "<select id='addGrowthType'><option>4</option><option>6</option><option>8</option><option>10</option><option>12</option></select>";
-	result += "<button onClick='addGrowth()'>+</button>";
+	result += "<button class='marginLeft' onClick='addGrowth()'>+</button>";
 
 	result += "<br/>\n";
 
-	result += "<table border='0'><tr><th colspan='3'>Values</th></tr>\n";
+	result += "<table border='0'><tr><th colspan='4'>Values</th></tr>\n";
 	for (var i = 0; i < _values.length; i++)
 	{
 		let value = src.values[_values[i]].value;
@@ -55,7 +54,7 @@ function generateOutput(src, dest, force)
 			value -= src.state.challenges[_values[i]] * 2;
 		}
 		result += "<tr><td class='valueTitle'>" + _values[i].capitalize() + "</td>";
-		result += "<td class='valueDie'>" + dice(1, value, _values[i]);
+		result += "<td class='valueDie'>" + dice(1, value, _values[i]) + "</td><td>";
 		if (value > 4)
 		{
 			result += "<button onclick='decDrive(\"" + _values[i] +  "\")'>-</button>";
@@ -78,7 +77,7 @@ function generateOutput(src, dest, force)
 	}
 	result += "</table><br/>\n";
 
-	result += "<table border='0'><tr><th colspan='3'>Relationships</th></tr>\n";
+	result += "<table border='0'><tr><th colspan='4'>Relationships</th></tr>\n";
 	for (var name in src.relationships)
 	{
 		let value = src.relationships[name].value;
@@ -87,7 +86,7 @@ function generateOutput(src, dest, force)
 			value -= src.state.challenges[name] * 2;
 		}
 		result += "<tr><td class='relationshipTitle'>" + apos(name) + "</td>";
-		result += "<td class='relationshipDie'>" + dice(1, value, apos(name));
+		result += "<td class='relationshipDie'>" + dice(1, value, apos(name)) + "</td><td>";
 		if (value > 4)
 		{
 			result += "<button onclick='decDrive(\"" + name +  "\")'>-</button>";
@@ -107,7 +106,7 @@ function generateOutput(src, dest, force)
 		}
 		result += "<tr><td class='resourceTitle'>" + apos(name) + "</td>";
 		result += "<td class='resourceDie'>";
-		result += resourceDice(count, src.resources[name].value, apos(name));
+		result += resourceDice(count, src.resources[name].value, apos(name)) + "</td><td>";
 		if (count > 0)
 		{
 			result += "<button onclick='decResource(\"" + name + "\")'>-</button>";

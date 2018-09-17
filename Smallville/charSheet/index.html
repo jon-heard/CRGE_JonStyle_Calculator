@@ -15,16 +15,17 @@
 			{
 				margin: 0em;
 			}
-			button
-			{
-				margin-right: .25em;
-			}
 			table
 			{
 				display: inline-block;
 				vertical-align: top;
 				margin-right: 2em;
 				margin-top: 1em;
+			}
+
+			td button
+			{
+				width: 100%;
 			}
 
 			td, th
@@ -40,6 +41,10 @@
 			{
     			padding-right: 1em;
 				font-weight: bold;
+			}
+			.marginLeft
+			{
+				margin-left: .25em;
 			}
 			.maxHeight
 			{
@@ -98,11 +103,11 @@
 			.valueText, .relationshipText, .resourceUses, .assetLimits
 			{
 				font-style: italic;
+				padding-left: 1em;
 			}
 			.valueDie, .stressDie, .relationshipDie, .resourceDie, .assetDie
 			{
-				padding: 0em 1em;
-				text-align: center;
+				padding-left: 1em;
 			}
 			.assetTitle, .assetDie
 			{
@@ -237,7 +242,38 @@
 	}
 	function decDrive(name)
 	{
-		if (!confirm("Confirm reducing '" + name + "'.")) { return; }
+		// if (!confirm("Confirm reducing '" + name + "'.")) { return; }
+		// if (!character.state.challenges.hasOwnProperty(name))
+		// {
+		// 	character.state.challenges[name] = 0;
+		// }
+		// character.state.challenges[name]++;
+		// refreshSource();
+
+		// Confirm
+		if (!confirm("Confirm challenging '" + name + "'.")) { return; }
+		// Get drive being challenged
+		var drive = {};
+		if (character.values.hasOwnProperty(name))
+		{
+			drive = character.values[name];
+		}
+		else if (character.relationships.hasOwnProperty(name))
+		{
+			drive = character.relationships[name];
+		}
+		else
+		{
+			return;
+		}
+		// Add drive to dice pool thrice
+		for (var i = 0; i < 3; i++)
+		{
+			addDieToPool(drive.value, name);
+		}
+		// Add drive to growth pool
+		character.state.growth.push(drive.value);
+		// Decrement drive
 		if (!character.state.challenges.hasOwnProperty(name))
 		{
 			character.state.challenges[name] = 0;

@@ -1,5 +1,5 @@
-- commit/push and transfer to computer
-- get in-progress characters worked out (for tonight)
+- fix bug with answers
+- setup alternative for highschool
 - setup "undo"
 - add questions for stage options
 - add descriptions for new distinctions
