@@ -1,5 +1,1 @@
-- pull changes in smallville project folder
-- delete smallville project folder
-- fix bug with answers
-- try char sheet and look for issues for next time
-- 
+- fix bug with chargen answers

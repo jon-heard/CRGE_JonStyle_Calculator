@@ -28,9 +28,15 @@
 				width: 100%;
 			}
 
+			.autoWidth
+			{
+				width: auto;
+			}
+
 			td, th
 			{
 				text-align: left;
+				vertical-align: top;
 			}
 			th
 			{
@@ -77,6 +83,7 @@
 				float: right;
     			overflow: auto;
 				resize: none;
+				padding: 1em;
 			}
 			#statusbar
 			{
@@ -85,12 +92,9 @@
 				height: 1.5em;
 				flex-grow: 100;
 				padding: 0em .5em;
+				white-space: nowrap;
 			}
 
-			#plotSpace
-			{
-				margin-right: 3em;
-			}
 			#plotValue, #growthValues
 			{
 				margin: 0em .5em;
@@ -99,6 +103,10 @@
 			.relationshipTitle, .resourceTitle, .assetTitle
 			{
 				font-weight: bold;
+			}
+			#addGrowthType
+			{
+				margin-left: 1em;
 			}
 			.valueText, .relationshipText, .resourceUses, .assetLimits
 			{
@@ -183,24 +191,41 @@
 	var input = $("#input");
 	var output = $("#output");
 	var character = {};
+	var save = true;
 
 	var pools = [];
 	pools.push([]);
 
 	$(function()
 	{
+		let args = getUrlArgs();
+		if (args.hasOwnProperty("side") && args.side == 0)
+		{
+			input.css("display", "none");
+			output.css("width", "100%");
+		}
+		if (args.hasOwnProperty("save") && args.save == 0)
+		{
+			save = false;
+		}
 		setStatusbar($("#statusbar"));
 		$("#refresh").click(function()
 		{
 			refresh(true);
 		});
-		input.val(localStorage.getItem("smallvilleSheet_mainData"));
+		if (save)
+		{
+			input.val(localStorage.getItem("smallvilleSheet_mainData"));
+		}
 		refresh();
 	});
 
 	input.change(function(key)
 	{
-		localStorage.setItem("smallvilleSheet_mainData", input.val());
+		if (save)
+		{
+			localStorage.setItem("smallvilleSheet_mainData", input.val());
+		}
 		refresh(false);
 	});
 
@@ -242,14 +267,6 @@
 	}
 	function decDrive(name)
 	{
-		// if (!confirm("Confirm reducing '" + name + "'.")) { return; }
-		// if (!character.state.challenges.hasOwnProperty(name))
-		// {
-		// 	character.state.challenges[name] = 0;
-		// }
-		// character.state.challenges[name]++;
-		// refreshSource();
-
 		// Confirm
 		if (!confirm("Confirm challenging '" + name + "'.")) { return; }
 		// Get drive being challenged
@@ -311,10 +328,14 @@
 
 	function refresh(force)
 	{
-		character = parseInput(input.val());
-		if (character)
+		var src = input.val();
+		if (isString(src) && src.trim() != "")
 		{
-			generateOutput(character, output, force);
+			character = parseInput(input.val());
+			if (character)
+			{
+				generateOutput(character, output, force);
+			}
 		}
 	}
 
@@ -428,5 +449,21 @@
 			comparison = 1;
 		}
 		return comparison;
+	}
+
+	function getUrlArgs()
+	{
+		var vars = {};
+		var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value)
+		{
+			vars[key] = value;
+		});
+		return vars;
+	}
+
+	function setCharacterSource(src)
+	{
+		input.val(src);
+		input.trigger("change");
 	}
 </script>

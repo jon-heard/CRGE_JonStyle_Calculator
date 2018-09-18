@@ -10,7 +10,6 @@ var _stresses = [ "afraid", "angry", "exhausted", "injured", "insecure" ];
 function generateOutput(src, dest, force)
 {
 	window.document.title = src.name + " (smallville)";
-	dest.css("padding", "2em");
 	var result = "";
 	result += "<h1>" + apos(src.name) + "</h1>\n";
 
@@ -26,12 +25,29 @@ function generateOutput(src, dest, force)
 	}
 	result += "</td></tr></table><br/><br/>\n";
 
-	result += "<span id='plotTitle'>Plot:</span><span id='plotValue'>" + src.state.plot + "</span>";
-	result += "<button onClick='incPlot()'>+</button>";
-	result += "<button class='marginLeft' onClick='decPlot()'>-</button>";
-	result += "<span id='plotSpace'/>";
+	result += "<table border='0'><tr><th colspan='3'>Stress</th></tr>\n";
+	for (var i = 0; i < _stresses.length; i++)
+	{
+		 result += "<tr><td class='stressTitle'>" + _stresses[i].capitalize() + "</td><td class='stressDie'>" + dice(1, src.state[_stresses[i]], _stresses[i] + "</td>");
+		 result += "<td><select onchange='setStress(\"" + _stresses[i] + "\", this.value)'>";
+		 for (var j = 0; j < 14; j += 2)
+		 {
+			 if (j == 2) { continue; }
+			 result += "<option value='" + j + "' " + (j==src.state[_stresses[i]] ? "selected" : "") + ">" + j + "</option>";
+		 }
+		 result += "</select></td></tr>\n";
+	}
+	result += "</table>\n";
 
+	result += "<table style='width: 9.5em;'><tr><td>";
+	result += "<span id='plotTitle'>Plot:</span><span id='plotValue'>" + src.state.plot + "</span>";
+	result += "<button class='autoWidth' onClick='incPlot()'>+</button>";
+	result += "<button class='autoWidth marginLeft' onClick='decPlot()'>-</button>";
+	result += "</td></tr><tr><td>";
 	result += "<span id='growthTitle'>Growth:</span>";
+	result += "<select id='addGrowthType'><option>4</option><option>6</option><option>8</option><option>10</option><option>12</option></select>";
+	result += "<button class='autoWidth marginLeft' onClick='addGrowth()'>+</button>";
+	result += "</td></tr><tr><td>";
 	var growthText = [];
 	for (var i = 0; i < src.state.growth.length; i++)
 	{
@@ -40,10 +56,7 @@ function generateOutput(src, dest, force)
 			src.state.growth[i] + "</a>");
 	}
 	result += "<span id='growthValues'>" + growthText.join(", ") + "</span>";
-	result += "<select id='addGrowthType'><option>4</option><option>6</option><option>8</option><option>10</option><option>12</option></select>";
-	result += "<button class='marginLeft' onClick='addGrowth()'>+</button>";
-
-	result += "<br/>\n";
+	result += "</td></tr></table><br/>";
 
 	result += "<table border='0'><tr><th colspan='4'>Values</th></tr>\n";
 	for (var i = 0; i < _values.length; i++)
@@ -62,20 +75,6 @@ function generateOutput(src, dest, force)
 		result += "</td><td class='valueText'>" + apos(src.values[_values[i]].text) + "</td></tr>\n";
 	}
 	result += "</table>\n";
-
-	result += "<table border='0'><tr><th colspan='3'>Stress</th></tr>\n";
-	for (var i = 0; i < _stresses.length; i++)
-	{
-		 result += "<tr><td class='stressTitle'>" + _stresses[i].capitalize() + "</td><td class='stressDie'>" + dice(1, src.state[_stresses[i]], _stresses[i] + "</td>");
-		 result += "<td><select onchange='setStress(\"" + _stresses[i] + "\", this.value)'>";
-		 for (var j = 0; j < 14; j += 2)
-		 {
-			 if (j == 2) { continue; }
-			 result += "<option value='" + j + "' " + (j==src.state[_stresses[i]] ? "selected" : "") + ">" + j + "</option>";
-		 }
-		 result += "</select></td></tr>\n";
-	}
-	result += "</table><br/>\n";
 
 	result += "<table border='0'><tr><th colspan='4'>Relationships</th></tr>\n";
 	for (var name in src.relationships)
@@ -96,7 +95,7 @@ function generateOutput(src, dest, force)
 	}
 	result += "</table>\n";
 
-	result += "<table border='0'><tr><th colspan='3'>Resources</th></tr>\n";
+	result += "<table border='0'><tr><th colspan='4'>Resources</th></tr>\n";
 	for (var name in src.resources)
 	{
 		let count = 2;

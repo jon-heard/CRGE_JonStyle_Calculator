@@ -413,19 +413,18 @@ var _steps = [
 		{
 			_tmp1 = data[0];
 			_tmp2 = data[1];
-			if (data[0] == "<< None >>" || data[1] == "<< None >>")
+			if (data[0] != "<< None >>" && data[1] != "<< None >>")
 			{
-				return;
-			}
-			for (var key in _character.resources)
-			{
-				if (key == data[0])
+				for (var key in _character.resources)
 				{
-					delete _character.resources[key];
-				}
-				if (key == data[1])
-				{
-					_character.resources[key].value += 2;
+					if (key == data[0])
+					{
+						delete _character.resources[key];
+					}
+					if (key == data[1])
+					{
+						_character.resources[key].value += 2;
+					}
 				}
 			}
 		}
@@ -604,15 +603,18 @@ var _steps = [
 	},
 	// feature statements
 	{
-		name: "wrapup 17", type: "text",
+		name: "wrapup 15", type: "goto",
+		data: function()
+		{
+			_tmp1 = findRelationshipMissingStatement();
+			return _tmp1.isEmpty() ? 3 : 1;
+		}
+	},
+	{
+		name: "wrapup 16", type: "text",
 		text: "How does <span class='charName'/> feel about <b><span id='focusRelationship'/></b>?",
 		pre: function ()
 		{
-			_tmp1 = findRelationshipMissingStatement();
-			if (_tmp1.isEmpty())
-			{
-				shiftStep(2);
-			}
 			$("#focusRelationship").html(_tmp1);
 		},
 		mid: function (data)
@@ -624,7 +626,7 @@ var _steps = [
 	},
 	{
 		name: "wrapup 17", type: "goto",
-		data: -1
+		data: -2
 	},
 
 	///////////////
@@ -641,7 +643,7 @@ var _steps = [
 	},
 	{
 		name: "levelup 04", type: "select", title: "Level up",
-		text: "How to level up the character?",
+		text: "In what way do you want to level up <span class='charName'/>?",
 		data: _levelupOptions,
 		mid: function (data)
 		{

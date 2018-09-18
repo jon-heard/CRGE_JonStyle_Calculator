@@ -1,0 +1,273 @@
+<html>
+	<head>
+		<title>Smallville session</title>
+		<script type='text/javascript' src='libs/jquery-3.3.1.min.js'></script>
+		<script type='text/javascript' src='libs/common.js'></script>
+	</head>
+	<style>
+		body
+		{
+			margin: 0;
+		}
+		td
+		{
+			vertical-align: top;
+		}
+		iframe
+		{
+			height: 100%;
+			width: 100%;
+		}
+		#content
+		{
+			width: 100%;
+			height: 100%;
+		}
+		#gmPane
+		{
+			width: 12em;
+			padding: 1em;
+			box-sizing: border-box;
+		}
+		#charList
+		{
+			height: 1.5em;
+		}
+
+		.link
+		{
+			cursor: pointer;
+		}
+		.link:hover
+		{
+			color: blue;
+			text-decoration: underline;
+		}
+
+		.rollResult
+		{
+			font-weight: bold;
+		}
+		.rollDetail
+		{
+			font-style: italic;
+			color: darkGrey;
+		}
+	</style>
+	<body>
+		<table id='content' border='1'><tr>
+			<td id='gmPane'>
+				<p><select id='dangerAddType'></select><button id='addDanger'>+</button></p>
+				<p id='dangerText'></p>
+				<p><button id='rollDanger'>Roll danger</button></p>
+				<p id='dangerRollResult'></p>
+				<br/>
+				<p>Char #1 <select id='char1Select'><option>&lt;&lt; None &gt;&gt;</option><option>Freddie</option><option>Jason</option></select></p>
+				<p>Char #2 <select id='char2Select'><option>&lt;&lt; None &gt;&gt;</option><option>Freddie</option><option>Jason</option></select></p>
+				<p>Char #3 <select id='char3Select'><option>&lt;&lt; None &gt;&gt;</option><option>Freddie</option><option>Jason</option></select></p>
+				<p><button id='addChar'>Add character</button></p>
+				<p><button id='copySession'>Copy session</button></p>
+			</td>
+			<td><iframe id='char1Slot' src='../charSheet/index.html?side=0&save=0'></iframe></td>
+			<td><iframe id='char2Slot' src='../charSheet/index.html?side=0&save=0'></iframe></td>
+			<td><iframe id='char3Slot' src='../charSheet/index.html?side=0&save=0'></iframe></td>
+		</tr></table>
+	</body>
+</html>
+
+<script>
+	var $dangerAddType = $("#dangerAddType");
+	var $dangerText = $("#dangerText");
+	var $dangerRollResult = $("#dangerRollResult");
+	var $charSelects = [$("#char1Select"), $("#char2Select"), $("#char3Select")];
+	var $charSlots = [$("#char1Slot"), $("#char2Slot"), $("#char3Slot")];
+	
+	var session = {
+		dangerPool: [],
+		characters: {}
+	};
+
+	$(function()
+	{
+		for (var i = 4; i <= 12; i += 2)
+		{
+			$dangerAddType.append("<option>" + i + "</option>");
+		}
+		$("#addDanger").click(addDanger);
+		$("#rollDanger").click(rollDanger);
+		$charSelects[0].change(char1Select);
+		$charSelects[1].change(char2Select);
+		$charSelects[2].change(char3Select);
+		$("#addChar").click(addChar);
+		$("#copySession").click(copySession);
+		loadSession();
+		$charSelects[0].trigger("change");
+		$charSelects[1].trigger("change");
+		$charSelects[2].trigger("change");
+	});
+
+	function addDanger()
+	{
+		var type = $dangerAddType.val();
+		session.dangerPool.push(type);
+		refreshDangerText();
+		saveSession();
+	}
+	function rollDanger()
+	{
+		var roll = [];
+		for (var i = 0; i < session.dangerPool.length; i++)
+		{
+			var dieType = session.dangerPool[i];
+			roll.push({ type: dieType, result: Math.floor(Math.random() * dieType + 1) });
+		}
+		roll.sort(rollResultCompare);
+		var text = "";
+		for (var i = 0; i < roll.length; i++)
+		{
+			if (i != 0)
+			{
+				text += ", ";
+			}
+			text += "<span class='rollResult'>" + roll[i].result + "</span>";
+			text += "<span class='rollDetail'>=D" + roll[i].type + "</span>";
+		}
+		$dangerRollResult.html(text);
+	}
+	function char1Select()
+	{
+		updateCharacterSlot(0);
+		saveSession();
+	}
+	function char2Select()
+	{
+		updateCharacterSlot(1);
+		saveSession();
+	}
+	function char3Select()
+	{
+		updateCharacterSlot(2);
+		saveSession();
+	}
+	function addChar()
+	{
+		var charSrc = prompt("Enter the character source");
+		var char = JSON.parse(charSrc);
+		if (char != null)
+		{
+			var name = char.name;
+			session.characters[name] = char;
+		}
+		refreshCharacterSelects();
+		saveSession();
+	}
+	function copySession()
+	{
+		var sessionSrc = JSON.stringify(session, null, 2);
+		textToClipboard(sessionSrc);
+	}
+
+	function removeDanger(index)
+	{
+		if (!confirm("Confirm removing Danger die type " + session.dangerPool[index] + "."))
+		{
+			return;
+		}
+		session.dangerPool.splice(index, 1);
+		refreshDangerText();
+		saveSession();
+	}
+
+	function refreshDangerText()
+	{
+		var text = "";
+		for (var i = 0; i < session.dangerPool.length; i++)
+		{
+			if (i != 0)
+			{
+				text += ", ";
+			}
+			text += "<a class='link' onclick='removeDanger(" + i + ")'>D";
+			text += session.dangerPool[i] + "</a>";
+		}
+		$dangerText.html(text);
+	}
+
+	function saveSession()
+	{
+		localStorage.setItem("smallvilleSession", JSON.stringify(session, null, 2));
+	}
+
+	function loadSession()
+	{
+		var newSession = JSON.parse(localStorage.getItem("smallvilleSession"));
+		if (newSession != null)
+		{
+			session = newSession;
+		}
+		refreshDangerText();
+		refreshCharacterSelects();
+		refreshCharacterSlots();
+	}
+
+	function rollResultCompare(a, b)
+	{
+		let comparison = 0;
+		let resultA = a.hasOwnProperty("result") ? a.result : 0;
+		let resultB = b.hasOwnProperty("result") ? b.result : 0;
+		if (resultA == resultB)
+		{
+			resultA = a.value;
+			resultB = b.value;
+		}
+		if (resultA > resultB)
+		{
+			comparison = -1;
+		}
+		else if (resultB > resultA)
+		{
+			comparison = 1;
+		}
+		return comparison;
+	}
+
+	function updateCharacterSlot(index)
+	{
+		var name = $charSelects[index].val();
+		var slot = $charSlots[index];
+		slot.css("display", name=="<< None >>" ? "none" : "inherit");
+		if (name != "<< None >>")
+		{
+			var slotContent = slot[0].contentWindow;
+			slotContent.setCharacterSource(JSON.stringify(session.characters[name]));
+		}
+	}
+
+	function refreshCharacterSelects()
+	{
+		var names = [];
+		names.push("<< None >>");
+		for (var key in session.characters)
+		{
+			names.push(key);
+		}
+		for (var i = 0; i < 3; i++)
+		{
+			$charSelects[i].html("");
+		}
+		for (var i = 0; i < names.length; i++)
+		{
+			for (var j = 0; j < 3; j++)
+			{
+				$charSelects[j].append("<option>" + names[i] + "</options>");
+			}
+		}
+	}
+
+	function refreshCharacterSlots()
+	{
+		updateCharacterSlot(0);
+		updateCharacterSlot(1);
+		updateCharacterSlot(2);
+	}
+</script>
