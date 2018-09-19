@@ -66,7 +66,9 @@
 				<p>Char #2 <select id='char2Select'><option>&lt;&lt; None &gt;&gt;</option><option>Freddie</option><option>Jason</option></select></p>
 				<p>Char #3 <select id='char3Select'><option>&lt;&lt; None &gt;&gt;</option><option>Freddie</option><option>Jason</option></select></p>
 				<p><button id='addChar'>Add character</button></p>
+				<p><button id='removeChar'>Remove character 3</button></p>
 				<p><button id='copySession'>Copy session</button></p>
+				<p><button id='importSession'>Import session</button></p>
 			</td>
 			<td><iframe id='char1Slot' src='../charSheet/index.html?side=0&save=0'></iframe></td>
 			<td><iframe id='char2Slot' src='../charSheet/index.html?side=0&save=0'></iframe></td>
@@ -100,10 +102,9 @@
 		$charSelects[2].change(char3Select);
 		$("#addChar").click(addChar);
 		$("#copySession").click(copySession);
+		$("#removeChar").click(removeChar);
+		$("#importSession").click(importSession);
 		loadSession();
-		$charSelects[0].trigger("change");
-		$charSelects[1].trigger("change");
-		$charSelects[2].trigger("change");
 	});
 
 	function addDanger()
@@ -151,8 +152,8 @@
 	}
 	function addChar()
 	{
-		var charSrc = prompt("Enter the character source");
-		var char = JSON.parse(charSrc);
+		var src = prompt("Enter the character source");
+		var char = JSON.parse(src);
 		if (char != null)
 		{
 			var name = char.name;
@@ -160,11 +161,55 @@
 		}
 		refreshCharacterSelects();
 		saveSession();
+		refreshCharacterSlots();
 	}
 	function copySession()
 	{
 		var sessionSrc = JSON.stringify(session, null, 2);
 		textToClipboard(sessionSrc);
+	}
+
+	function removeChar()
+	{
+		var name = $charSelects[2].val();
+		if (name != "<< None >>")
+		{
+			if (confirm("Confirm removing character \"" + name + "\"."))
+			{
+				delete session.characters[name];
+				saveSession();
+				refreshCharacterSelects();
+				refreshCharacterSlots();
+			}
+		}
+	}
+
+	function importSession()
+	{
+		var src = prompt("Enter the session source");
+		if (src == null)
+		{
+			return;
+		}
+		if (src == "")
+		{
+			session = { dangerPool: [], characters: {} };
+		}
+		else
+		{
+			var newSession = JSON.parse(src);
+			if (newSession == null)
+			{
+				alert("Failed to parse session source.");
+				return;
+			}
+			session = newSession;
+		}
+		saveSession();
+		refreshDangerText();
+		refreshCharacterSelects();
+		refreshCharacterSlots();
+		$dangerRollResult.html("");
 	}
 
 	function removeDanger(index)
