@@ -211,7 +211,7 @@
 		setStatusbar($("#statusbar"));
 		$("#refresh").click(function()
 		{
-			refresh(true);
+			refresh();
 		});
 		if (save)
 		{
@@ -226,7 +226,7 @@
 		{
 			localStorage.setItem("smallvilleSheet_mainData", input.val());
 		}
-		refresh(false);
+		refresh();
 	});
 
 	$(".addDie").click(function()
@@ -326,7 +326,7 @@
 		return pools[pools.length - 1];
 	}
 
-	function refresh(force)
+	function refresh()
 	{
 		var src = input.val();
 		if (isString(src) && src.trim() != "")
@@ -334,7 +334,7 @@
 			character = parseInput(input.val());
 			if (character)
 			{
-				generateOutput(character, output, force);
+				generateOutput(character, output);
 			}
 		}
 	}
@@ -461,9 +461,15 @@
 		return vars;
 	}
 
-	function setCharacterSource(src)
+	function getCharacter()
 	{
-		input.val(src);
-		input.trigger("change");
+		return character;
+	}
+
+	function setCharacter(pCharacter)
+	{
+		character = pCharacter;
+		clearPool();
+		generateOutput(character, output);
 	}
 </script>

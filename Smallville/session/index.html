@@ -83,6 +83,7 @@
 	var $dangerRollResult = $("#dangerRollResult");
 	var $charSelects = [$("#char1Select"), $("#char2Select"), $("#char3Select")];
 	var $charSlots = [$("#char1Slot"), $("#char2Slot"), $("#char3Slot")];
+	var slottedCharNames = ["", "", ""];
 	
 	var session = {
 		dangerPool: [],
@@ -278,13 +279,19 @@
 
 	function updateCharacterSlot(index)
 	{
+		if (session.characters.hasOwnProperty(slottedCharNames[index]))
+		{
+			var slotContent = $charSlots[index][0].contentWindow;
+			session.characters[slottedCharNames[index]] = slotContent.getCharacter();
+		}
 		var name = $charSelects[index].val();
+		slottedCharNames[index] = name;
 		var slot = $charSlots[index];
 		slot.css("display", name=="<< None >>" ? "none" : "inherit");
 		if (name != "<< None >>")
 		{
 			var slotContent = slot[0].contentWindow;
-			slotContent.setCharacterSource(JSON.stringify(session.characters[name]));
+			slotContent.setCharacter(session.characters[name]);
 		}
 	}
 

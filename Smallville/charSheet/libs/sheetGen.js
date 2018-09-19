@@ -7,7 +7,7 @@ function parseInput(src)
 var _values = [ "duty", "glory", "justice", "love", "power", "truth" ];
 var _stresses = [ "afraid", "angry", "exhausted", "injured", "insecure" ];
 
-function generateOutput(src, dest, force)
+function generateOutput(src, dest)
 {
 	window.document.title = src.name + " (smallville)";
 	var result = "";
