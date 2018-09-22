@@ -100,9 +100,13 @@
 				margin: 0em .5em;
 			}
 			#plotTitle, #growthTitle, .valueTitle, .stressTitle,
-			.relationshipTitle, .resourceTitle, .assetTitle
+			.relationshipTitle, .resourceTitle, .assetTitle, .commentTitle
 			{
 				font-weight: bold;
+			}
+			.comment
+			{
+				padding: 0em 1em;
 			}
 			#addGrowthType
 			{
@@ -192,6 +196,7 @@
 	var output = $("#output");
 	var character = {};
 	var save = true;
+	var commentsBeingEdited = {};
 
 	var pools = [];
 	pools.push([]);
@@ -226,6 +231,7 @@
 		{
 			localStorage.setItem("smallvilleSheet_mainData", input.val());
 		}
+		commentsBeingEdited = {};
 		refresh();
 	});
 
@@ -471,5 +477,84 @@
 		character = pCharacter;
 		clearPool();
 		generateOutput(character, output);
+	}
+
+	function toggleEditingComment(name)
+	{
+		if (commentsBeingEdited.hasOwnProperty(name))
+		{
+			delete commentsBeingEdited[name];
+		}
+		else
+		{
+			commentsBeingEdited[name] = "";
+		}
+		refreshComments();
+	}
+
+	function removeComment(name)
+	{
+		if (confirm("Are you sure you want to remove comment \"" + name + "\"?"))
+		{
+			delete character.comments[name];
+			refreshComments();
+			refreshSource();
+		}
+	}
+
+	function addComment()
+	{
+		var name = prompt("Enter the name for a new comment or a comment to replace.");
+		if (name != null)
+		{
+			if (!character.hasOwnProperty("comments"))
+			{
+				character.comments = {};
+			}
+			if (character.comments.hasOwnProperty(name))
+			{
+				alert("Add failed: There is already a comment named \"" + name + "\".");
+			}
+			else
+			{
+				character.comments[name] = "";
+				refreshComments();
+				refreshSource();
+			}
+		}
+	}
+
+	function updateComment(name, value)
+	{
+		character.comments[name] = value;
+		input.val(JSON.stringify(character, null, 2));
+		if (save)
+		{
+			localStorage.setItem("smallvilleSheet_mainData", input.val());
+		}
+	}
+
+	function refreshComments()
+	{
+		var result = "<tr><th colspan='3'>Comments</th></tr>";
+		if (character.hasOwnProperty("comments"))
+		{
+			for (var key in character.comments)
+			{
+				result += "<tr><td class='commentTitle'>" + key + "</td>";
+				if (commentsBeingEdited.hasOwnProperty(key))
+				{
+					result += "<td class='comment'><textarea onkeydown='updateComment(\"" + key + "\", this.value)'>" + character.comments[key] + "</textarea></td>";
+				}
+				else
+				{
+					result += "<td class='comment'>" + character.comments[key].replaceAll("\n", "<br/>") + "</td>";
+				}
+				result += "<td><button class='autoWidth' onclick='toggleEditingComment(\"" + key + "\")'>...</button>";
+				result += "<button class='autoWidth marginLeft' onclick='removeComment(\"" + key + "\")'>-</button></td></tr>";
+			}
+		}
+		result += "<tr><td colspan='3'><button class='autoWidth' onclick='addComment()'>+</button></td></tr>";
+		$("#comments").html(result);
 	}
 </script>

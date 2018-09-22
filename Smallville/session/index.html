@@ -66,6 +66,7 @@
 				<p>Char #2 <select id='char2Select'><option>&lt;&lt; None &gt;&gt;</option><option>Freddie</option><option>Jason</option></select></p>
 				<p>Char #3 <select id='char3Select'><option>&lt;&lt; None &gt;&gt;</option><option>Freddie</option><option>Jason</option></select></p>
 				<p><button id='addChar'>Add character</button></p>
+				<p><button id='exportChar'>Export character 3</button></p>
 				<p><button id='removeChar'>Remove character 3</button></p>
 				<p><button id='copySession'>Copy session</button></p>
 				<p><button id='importSession'>Import session</button></p>
@@ -102,8 +103,9 @@
 		$charSelects[1].change(char2Select);
 		$charSelects[2].change(char3Select);
 		$("#addChar").click(addChar);
-		$("#copySession").click(copySession);
+		$("#exportChar").click(exportChar);
 		$("#removeChar").click(removeChar);
+		$("#copySession").click(copySession);
 		$("#importSession").click(importSession);
 		loadSession();
 	});
@@ -165,10 +167,14 @@
 		slottedCharNames = ["", "", ""];
 		refreshCharacterSlots();
 	}
-	function copySession()
+
+	function exportChar()
 	{
-		var sessionSrc = JSON.stringify(session, null, 2);
-		textToClipboard(sessionSrc);
+		var name = $charSelects[2].val();
+		if (name != "<< None >>")
+		{
+			textToClipboard(JSON.stringify(session.characters[name], null, 2));
+		}
 	}
 
 	function removeChar()
@@ -184,6 +190,12 @@
 				refreshCharacterSlots();
 			}
 		}
+	}
+
+	function copySession()
+	{
+		var sessionSrc = JSON.stringify(session, null, 2);
+		textToClipboard(sessionSrc);
 	}
 
 	function importSession()

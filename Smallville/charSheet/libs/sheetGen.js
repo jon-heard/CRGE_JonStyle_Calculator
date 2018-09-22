@@ -136,7 +136,11 @@ function generateOutput(src, dest)
 	}
 	result += "</table>\n";
 
+	result += "<table id='comments' border='0'><tr><th colspan='3'>Comments</th></tr></table>\n";
+
 	dest.html(result);
+
+	refreshComments();
 }
 
 function getAssetUi(name, value, limits, effects)
