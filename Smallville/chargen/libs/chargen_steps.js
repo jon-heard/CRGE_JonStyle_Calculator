@@ -1,5 +1,7 @@
 
 var _levelupOptions = [
+	"Add / Replace comment", "Remove comment",
+	"",
 	"Change value statement", "Change relationship statement",
 	"",
 	"Add relationship", "Add extra", "Add location", "Add distinction", "Add ability",
@@ -13,6 +15,9 @@ var _levelupOptions = [
 ];
 
 var _levelupSteps = {
+	"Add / Replace comment": "Add / replace comment 01",
+	"Remove comment": "Remove comment 01",
+
 	"Change value statement": "Value statement 01",
 	"Change relationship statement": "Relationship statement 01",
 
@@ -680,6 +685,41 @@ var _steps = [
 				return -1;
 			}
 		}
+	},
+
+	{
+		name: "Add / replace comment 01", type: "text2",
+		text: "Enter the comment name and text",
+		post: function(data)
+		{
+			_character.comments[data[0]] = data[1]; 
+		}
+	},
+	{
+		name: "Add / replace comment 02", type: "goto",
+		data: function() { return _returnStep; }
+	},
+
+	{
+		name: "Remove comment 01", type: "select",
+		text: "Choose the comment to remove",
+		data: function()
+		{
+			var result = [];
+			for (var key in _character.comments)
+			{
+				result.push(key);
+			}
+			return result;
+		},
+		post: function(data)
+		{
+			delete _character.comments[data];
+		}
+	},
+	{
+		name: "Remove comment 02", type: "goto",
+		data: function() { return _returnStep; }
 	},
 
 	{

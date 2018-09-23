@@ -1,3 +1,1 @@
-levelup: add "Add/Replace comment" and "Remove comment"
-type: "smallville v1"
 - fix bug with chargen answers

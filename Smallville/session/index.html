@@ -156,6 +156,10 @@
 	function addChar()
 	{
 		var src = prompt("Enter the character source");
+		if (!src.trim().startsWith("{"))
+		{
+			src = "{ \"name\": \"" + src + "\" }";
+		}
 		var char = JSON.parse(src);
 		if (char != null)
 		{
@@ -292,11 +296,7 @@
 
 	function updateCharacterSlot(index)
 	{
-		if (session.characters.hasOwnProperty(slottedCharNames[index]))
-		{
-			var slotContent = $charSlots[index][0].contentWindow;
-			session.characters[slottedCharNames[index]] = slotContent.getCharacter();
-		}
+		updateCharactersFromSlot();
 		var name = $charSelects[index].val();
 		slottedCharNames[index] = name;
 		var slot = $charSlots[index];
@@ -334,5 +334,17 @@
 		updateCharacterSlot(0);
 		updateCharacterSlot(1);
 		updateCharacterSlot(2);
+	}
+
+	function updateCharactersFromSlot()
+	{
+		for (var i = 0; i < 3; i++)
+		{
+			if (session.characters.hasOwnProperty(slottedCharNames[i]))
+			{
+				var slotContent = $charSlots[i][0].contentWindow;
+				session.characters[slottedCharNames[i]] = slotContent.getCharacter();
+			}
+		}
 	}
 </script>

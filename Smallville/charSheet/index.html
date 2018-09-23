@@ -544,7 +544,7 @@
 				result += "<tr><td class='commentTitle'>" + key + "</td>";
 				if (commentsBeingEdited.hasOwnProperty(key))
 				{
-					result += "<td class='comment'><textarea onkeydown='updateComment(\"" + key + "\", this.value)'>" + character.comments[key] + "</textarea></td>";
+					result += "<td class='comment'><textarea onkeyup='updateComment(\"" + key + "\", this.value)'>" + character.comments[key] + "</textarea></td>";
 				}
 				else
 				{

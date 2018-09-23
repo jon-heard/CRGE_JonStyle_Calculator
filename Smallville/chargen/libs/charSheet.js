@@ -1,4 +1,5 @@
 var _defaultCharacter = {
+	"type": { "name": "smallville", "version": "1" },
     "name": "Unnamed",
     "appearance": "Nondescript",
 	"background": "Amnesiac",
@@ -17,6 +18,7 @@ var _defaultCharacter = {
     "distinctions": {},
 	"abilities": {},
 	"gear": {},
+	"comments": {},
     "state": {
       "afraid": 0,
       "angry": 0,
@@ -30,6 +32,7 @@ var _defaultCharacter = {
     }
 }
 var _testCharacter = {
+	"type": "smallville v1.0",
 	"name": "Clark",
 	"appearance": "Tall, built, dark hair, low key",
 	"background": "farming, journalism",
@@ -116,6 +119,7 @@ var _testCharacter = {
 			"Listen in on a phonecall with a known number."
 		]}
 	},
+	"comments": {},
 	"state": {
 		"afraid": 0, "angry": 0, "exhausted": 0, "injured": 0, "insecure": 0, "plot": 1,
 		"growth": [],
@@ -215,7 +219,16 @@ function makeSheet()
 			name, gear.value, ["gear"], effects);
 	}
     ui += "</table><br/><br/>\n";
-    return ui;
+
+	ui += "<table border='0'><tr><th colspan='3'>Comments</th></tr>\n";
+	for (var name in _character.comments)
+	{
+		ui += "<tr><td class='commentTitle'>" + name + "</td>";
+		ui += "<td>" + _character.comments[name] + "</td></tr>";
+	}
+    ui += "</table><br/><br/>\n";
+
+	return ui;
 }
 
 function getAssetUi(name, value, limits, effects)
