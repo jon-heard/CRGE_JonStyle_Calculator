@@ -1128,7 +1128,7 @@ var _steps = [
 		post: function (data)
 		{
 			_character.distinctions[data].value += 2;
-			fDistinction(data);
+			refreshDistinction(data);
 		}
 	},
 	{

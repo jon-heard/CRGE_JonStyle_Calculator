@@ -453,6 +453,7 @@ var _stages_classic =
 				else
 				{
 					_character.distinctions[_tmp1].value += 2;
+					refreshDistinction(_tmp1);
 				}
 			}
 		},
@@ -608,6 +609,7 @@ var _stages_classic =
 					if (_character.distinctions.hasOwnProperty(data))
 					{
 						_character.distinctions[data].value += 2;
+						refreshDistinction(data);
 					}
 					else if (_character.gear.hasOwnProperty(data))
 					{

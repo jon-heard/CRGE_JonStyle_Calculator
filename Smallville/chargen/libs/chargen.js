@@ -205,14 +205,21 @@ function handleSelect1Change()
 {
 	var value = $("#chargenSelect").val();
 	$("#chargenOk").prop("disabled", value == "");
+	var description = "";
 	if (_selectDescriptions.hasOwnProperty(value))
 	{
-		$("#selectDescription").html(_selectDescriptions[value]);
+		description += _selectDescriptions[value];
 	}
-	else
+	var distinctionIndex = findDistinction(value);
+	if (distinctionIndex != -1)
 	{
-		$("#selectDescription").html("");
+		var triggers = _distinctions[distinctionIndex].triggers;
+		for (var i = 0; i < triggers.length; i++)
+		{
+			description += "<br/> At D" + (i*4+4) + ": " + triggers[i];
+		}
 	}
+	$("#selectDescription").html(description);
 	_midFnc(value);
 }
 
