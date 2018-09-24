@@ -201,17 +201,37 @@ var _steps = [
 	    text: "Pick a \"youth\" pathway.",
 	    data: function()
 	    {
-	        return _pathwayChoices;
+			var result = _pathwayChoices.slice();
+			result.push("&lt;&lt; Other &gt;&gt;");
+	        return result;
 	    },
 	    post: function(data)
 	    {
 			_tmp1 = data;
-			_character.path.push(data);
-			_character.pathTitles.push(_stages.stageNames[1]);
+			if (_tmp1 != "<< Other >>")
+			{
+				_character.path.push(data);
+				_character.pathTitles.push(_stages.stageNames[1]);
+			}
 	    }
 	},
 	{
 		name: "youth 08", type: "goto",
+		data: function() { return _tmp1=="<< Other >>" ? 1 : 2; }
+	},
+	{
+		name: "youth 09", type: "select",
+		text: "Pick a \"youth\" pathway.",
+		data: [ "jock", "average", "geek", "outsider", "paragon" ],
+		post: function (data)
+		{
+			_tmp1 = data;
+			_character.path.push(data);
+			_character.pathTitles.push(_stages.stageNames[1]);
+	}
+	},
+	{
+		name: "youth 10", type: "goto",
 		data: function() { return _tmp1 + " 01"; }
 	},
 
@@ -254,19 +274,40 @@ var _steps = [
 	    text: "Pick a \"focus\" pathway.",
 	    data: function()
 	    {
-	        return _pathwayChoices;
+			var result = _pathwayChoices.slice();
+			result.push("&lt;&lt; Other &gt;&gt;");
+	        return result;
 	    },
 	    post: function(data)
 	    {
-		   _tmp1 = data;
-		   _character.path.push(data);
-		   _character.pathTitles.push(_stages.stageNames[2]);
+			_tmp1 = data;
+			if (_tmp1 != "<< Other >>")
+			{
+				_character.path.push(data);
+				_character.pathTitles.push(_stages.stageNames[2]);
+			}
 	    }
 	},
 	{
-		name: "focus 07", type: "goto",
+		name: "focus 08", type: "goto",
+		data: function() { return _tmp1=="<< Other >>" ? 1 : 2; }
+	},
+	{
+		name: "focus 09", type: "select",
+		text: "Pick a \"focus\" pathway.",
+		data: [ "money", "life", "status", "technology", "paranormal" ],
+		post: function (data)
+		{
+			_tmp1 = data;
+			_character.path.push(data);
+			_character.pathTitles.push(_stages.stageNames[2]);
+		}
+	},
+	{
+		name: "focus 10", type: "goto",
 		data: function() { return _tmp1 + " 01"; }
 	},
+
 
 	////////////
 	// 4-road //
@@ -288,20 +329,42 @@ var _steps = [
 	{
 		name: "road 04", type: "select",
 	    text: "Pick a \"road\" pathway.",
-	    data: function() {
-	        return _pathwayChoices;
+	    data: function()
+	    {
+			var result = _pathwayChoices.slice();
+			result.push("&lt;&lt; Other &gt;&gt;");
+	        return result;
 	    },
 	    post: function(data)
 	    {
-	       _tmp1 = data;
-		   _character.path.push(data);
-		   _character.pathTitles.push(_stages.stageNames[3]);
-	   }
+			_tmp1 = data;
+			if (_tmp1 != "<< Other >>")
+			{
+				_character.path.push(data);
+				_character.pathTitles.push(_stages.stageNames[3]);
+			}
+	    }
 	},
 	{
 		name: "road 05", type: "goto",
+		data: function() { return _tmp1=="<< Other >>" ? 1 : 2; }
+	},
+	{
+		name: "road 06", type: "select",
+	    text: "Pick a \"road\" pathway.",
+		data: [ "risky", "straight and narrow", "lofty", "underground", "ethical" ],
+		post: function (data)
+		{
+			_tmp1 = data;
+			_character.path.push(data);
+			_character.pathTitles.push(_stages.stageNames[3]);
+		}
+	},
+	{
+		name: "road 07", type: "goto",
 		data: function() { return _tmp1 + " 01"; }
 	},
+
 
 	///////////////////////////
 	// 5-life changing event //
