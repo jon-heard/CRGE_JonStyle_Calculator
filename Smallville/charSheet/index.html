@@ -468,7 +468,11 @@
 	function setCharacter(pCharacter)
 	{
 		character = pCharacter;
-		clearPool();
+		while(pools.length > 1)
+		{
+			popPool();
+		}
+		popPool();
 		generateOutput(character, output);
 	}
 
