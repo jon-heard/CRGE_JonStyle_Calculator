@@ -57,17 +57,21 @@
 	<body>
 		<table id='content' border='1'><tr>
 			<td id='gmPane'>
+				<p>Char #1 <select id='char1Select'><option>&lt;&lt; None &gt;&gt;</option><option>Freddie</option><option>Jason</option></select></p>
+				<p>Char #2 <select id='char2Select'><option>&lt;&lt; None &gt;&gt;</option><option>Freddie</option><option>Jason</option></select></p>
+				<p>Char #3 <select id='char3Select'><option>&lt;&lt; None &gt;&gt;</option><option>Freddie</option><option>Jason</option></select></p>
+				<p><button id='raiseChar'>Raise character 3</button><button id='lowerChar'>Lower character 3</button></p>
+				<p><button id='addChar'>Add character</button></p>
+				<p><button id='exportChar'>Export character 3</button></p>
+				<p><button id='removeChar'>Remove character 3</button></p>
+				<br/>
+
 				<p><select id='dangerAddType'></select><button id='addDanger'>+</button></p>
 				<p id='dangerText'></p>
 				<p><button id='rollDanger'>Roll danger</button></p>
 				<p id='dangerRollResult'></p>
 				<br/>
-				<p>Char #1 <select id='char1Select'><option>&lt;&lt; None &gt;&gt;</option><option>Freddie</option><option>Jason</option></select></p>
-				<p>Char #2 <select id='char2Select'><option>&lt;&lt; None &gt;&gt;</option><option>Freddie</option><option>Jason</option></select></p>
-				<p>Char #3 <select id='char3Select'><option>&lt;&lt; None &gt;&gt;</option><option>Freddie</option><option>Jason</option></select></p>
-				<p><button id='addChar'>Add character</button></p>
-				<p><button id='exportChar'>Export character 3</button></p>
-				<p><button id='removeChar'>Remove character 3</button></p>
+
 				<p><button id='copySession'>Copy session</button></p>
 				<p><button id='importSession'>Import session</button></p>
 			</td>
@@ -88,23 +92,27 @@
 	
 	var session = {
 		dangerPool: [],
-		characters: {}
+		characters: []
 	};
 
 	$(function()
 	{
+		$charSelects[0].change(char1Select);
+		$charSelects[1].change(char2Select);
+		$charSelects[2].change(char3Select);
+		$("#raiseChar").click(raiseChar);
+		$("#lowerChar").click(lowerChar);
+		$("#addChar").click(addChar);
+		$("#exportChar").click(exportChar);
+		$("#removeChar").click(removeChar);
+
 		for (var i = 4; i <= 12; i += 2)
 		{
 			$dangerAddType.append("<option>" + i + "</option>");
 		}
 		$("#addDanger").click(addDanger);
 		$("#rollDanger").click(rollDanger);
-		$charSelects[0].change(char1Select);
-		$charSelects[1].change(char2Select);
-		$charSelects[2].change(char3Select);
-		$("#addChar").click(addChar);
-		$("#exportChar").click(exportChar);
-		$("#removeChar").click(removeChar);
+
 		$("#copySession").click(copySession);
 		$("#importSession").click(importSession);
 		loadSession();
@@ -155,16 +163,37 @@
 	}
 	function addChar()
 	{
-		var src = prompt("Enter the character source");
+		var src = prompt("Enter the character's source");
+		if (src == null) { return; }
+		var char = null;
 		if (!src.trim().startsWith("{"))
 		{
-			src = "{ \"name\": \"" + src + "\" }";
+			char = { name: src, comments: {
+				Summary: "", Looks: "", Background: "", Details: "", Acting: ""
+			}};
 		}
-		var char = JSON.parse(src);
+		else
+		{
+			char = JSON.parse(src);
+		}
 		if (char != null)
 		{
-			var name = char.name;
-			session.characters[name] = char;
+			var index = findSessionCharacterIndex(char.name);
+			if (index == -1)
+			{
+				session.characters.push(char);
+			}
+			else
+			{
+				if (confirm("Are you sure you want to overwrite \"" + char.name + "\"?"))
+				{
+					session.characters[index] = char;
+				}
+				else
+				{
+					return;
+				}
+			}
 		}
 		refreshCharacterSelects();
 		saveSession();
@@ -177,7 +206,15 @@
 		var name = $charSelects[2].val();
 		if (name != "<< None >>")
 		{
-			textToClipboard(JSON.stringify(session.characters[name], null, 2));
+			var index = findSessionCharacterIndex(name);
+			if (index != -1)
+			{
+				textToClipboard(JSON.stringify(session.characters[index], null, 2));
+			}
+			else
+			{
+				alert("ERROR: Invalid character: \"" + name + "\".");
+			}
 		}
 	}
 
@@ -188,10 +225,60 @@
 		{
 			if (confirm("Confirm removing character \"" + name + "\"."))
 			{
-				delete session.characters[name];
-				saveSession();
-				refreshCharacterSelects();
-				refreshCharacterSlots();
+				var index = findSessionCharacterIndex(name);
+				if (index != -1)
+				{
+					session.characters.splice(index, 1);
+					saveSession();
+					refreshCharacterSelects();
+					refreshCharacterSlots();
+				}
+				else
+				{
+					alert("ERROR: Invalid character: \"" + name + "\".");
+				}
+			}
+		}
+	}
+
+	function raiseChar()
+	{
+		var name = $charSelects[2].val();
+		if (name != "<< None >>")
+		{
+			var index = findSessionCharacterIndex(name);
+			if (index != -1)
+			{
+				if (session.characters.moveElement(index, index-1))
+				{
+					saveSession();
+					refreshCharacterSelects();
+				}
+			}
+			else
+			{
+				alert("ERROR: Invalid character: \"" + name + "\".");
+			}
+		}
+	}
+
+	function lowerChar()
+	{
+		var name = $charSelects[2].val();
+		if (name != "<< None >>")
+		{
+			var index = findSessionCharacterIndex(name);
+			if (index != -1)
+			{
+				if (session.characters.moveElement(index, index+1))
+				{
+					saveSession();
+					refreshCharacterSelects();
+				}
+			}
+			else
+			{
+				alert("ERROR: Invalid character: \"" + name + "\".");
 			}
 		}
 	}
@@ -205,13 +292,10 @@
 	function importSession()
 	{
 		var src = prompt("Enter the session source");
-		if (src == null)
-		{
-			return;
-		}
+		if (src == null) { return; }
 		if (src == "")
 		{
-			session = { dangerPool: [], characters: {} };
+			session = { dangerPool: [], characters: [] };
 		}
 		else
 		{
@@ -300,11 +384,19 @@
 		var name = $charSelects[index].val();
 		slottedCharNames[index] = name;
 		var slot = $charSlots[index];
-		slot.css("display", name=="<< None >>" ? "none" : "inherit");
+		slot.css("display", (name=="<< None >>") ? "none" : "inherit");
 		if (name != "<< None >>")
 		{
-			var slotContent = slot[0].contentWindow;
-			slotContent.setCharacter(session.characters[name]);
+			var index = findSessionCharacterIndex(name);
+			if (index != -1)
+			{
+				var slotContent = slot[0].contentWindow;
+				slotContent.setCharacter(session.characters[index]);
+			}
+			else
+			{
+				alert("ERROR: Invalid character: \"" + name + "\".");
+			}
 		}
 	}
 
@@ -312,19 +404,20 @@
 	{
 		var names = [];
 		names.push("<< None >>");
-		for (var key in session.characters)
+		for (var i = 0; i < session.characters.length; i++)
 		{
-			names.push(key);
+			names.push(session.characters[i].name);
 		}
 		for (var i = 0; i < 3; i++)
 		{
 			$charSelects[i].html("");
-		}
-		for (var i = 0; i < names.length; i++)
-		{
-			for (var j = 0; j < 3; j++)
+			for (var j = 0; j < names.length; j++)
 			{
-				$charSelects[j].append("<option>" + names[i] + "</options>");
+				$charSelects[i].append("<option>" + names[j] + "</options>");
+			}
+			if (slottedCharNames[i] != "")
+			{
+				$charSelects[i].val(slottedCharNames[i]);
 			}
 		}
 	}
@@ -340,11 +433,24 @@
 	{
 		for (var i = 0; i < 3; i++)
 		{
-			if (session.characters.hasOwnProperty(slottedCharNames[i]))
+			var index = findSessionCharacterIndex(slottedCharNames[i]);
+			if (index != -1)
 			{
 				var slotContent = $charSlots[i][0].contentWindow;
-				session.characters[slottedCharNames[i]] = slotContent.getCharacter();
+				session.characters[index] = slotContent.getCharacter();
 			}
 		}
+	}
+
+	function findSessionCharacterIndex(name)
+	{
+		for (var i = 0; i < session.characters.length; i++)
+		{
+			if (session.characters[i].hasOwnProperty("name") && session.characters[i].name == name)
+			{
+				return i;
+			}
+		}
+		return -1;
 	}
 </script>

@@ -58,7 +58,13 @@ function generateOutput(src, dest)
 				src.state.growth[i] + "</a>");
 		}
 		result += "<span id='growthValues'>" + growthText.join(", ") + "</span>";
-		result += "</td></tr></table><br/>";
+		result += "</td></tr>";
+		result += "<tr><td>";
+		result += "<button class='autoWidth' onClick='listChallenges()'>List challenges</button>";
+		result += "</td></tr><tr><td>";
+		result += "<button class='autoWidth' onClick='resetChar()'>Reset Character</button>";
+		result += "</td></tr>";
+		result += "</table><br/>";
 
 		result += "<table border='0'><tr><th colspan='4'>Values</th></tr>\n";
 		for (var i = 0; i < _values.length; i++)

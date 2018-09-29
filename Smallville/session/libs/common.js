@@ -25,6 +25,16 @@ String.prototype.isEmpty = function (val)
 	return this.trim() == "";
 }
 
+Array.prototype.moveElement = function(from, to)
+{
+	if (from < this.length && from >= 0 && to < this.length && to >= 0)
+	{
+		this.splice(to, 0, this.splice(from, 1)[0]);
+		return true;
+	}
+	return false;
+}
+
 function isFunction(val)
 {
 	return val && {}.toString.call(val) === '[object Function]';

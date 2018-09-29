@@ -1,6 +1,1 @@
-session: make characters an array instead of object: allows reordering
-session: add "raise character 3" and "lower character 3"
-add fnc to reset character changes (how to best do this?)
-session: have add character - string (name) include default comments (summary, background, now, quirks)
-char sheet: have appearance and background be comments in characters and change "Appearance" to "looks"
-- fix bug with chargen answers
+- fix bugs with chargen answers

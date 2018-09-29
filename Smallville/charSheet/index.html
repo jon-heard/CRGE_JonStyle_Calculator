@@ -64,6 +64,7 @@
 			{
 				display: flex;
 				padding-left: .25em;
+				height: 1.5em;
 			}
 			#input
 			{
@@ -184,9 +185,9 @@
 			<button class='addDie' value='10'>10</button>
 			<button class='addDie' value='12'>12</button>
 			<button id='rollPool'>&#127922;</button>
-			<button id='rollStress'>&#129301;</button>
+			<button id='rollStress'>&#128128;</button>
 			<button id='pushPool'>&#128204;</button>
-			<button id='popPool'>&#127853;</button>
+			<button id='popPool'>&#10060;</button>
 			<div id='statusbar'>&nbsp;</div>
 		</div>
 	</body>
@@ -568,5 +569,37 @@
 			pools.push([]);
 		}
 		refreshPoolDisplay();
+	}
+
+	function listChallenges()
+	{
+		var msg = "Challenged drives:\n";
+		var hasItems = false;
+		for (var key in character.state.challenges)
+		{
+			let count = character.state.challenges[key];
+			msg += "- " + key.capitalize() + " (" + count + " ";
+			msg += (count==1 ? "time" : "times") + ")\n";
+			hasItems = true;
+		}
+		if (!hasItems)
+		{
+			msg += "  None";
+		}
+		alert(msg);
+	}
+
+	function resetChar()
+	{
+		var msg = "Are you sure you want to reset:\n";
+		msg += "- Plot points\n- Stress pools\n- Growth pool\n- Used resources\n- Challenged drives";
+		if (confirm(msg))
+		{
+			character.state = {
+				plot: 0, afraid: 0, angry: 0, exhausted: 0, injured: 0, insecure: 0,
+				growth: [], challenges: {}, resourceUse: {}
+			};
+			refreshSource();
+		}
 	}
 </script>
