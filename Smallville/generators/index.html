@@ -1,0 +1,76 @@
+
+<html>
+	<body>
+		<button onclick='onGenButton()'>Generate situation</button><br/><br/>
+		<div id='output'/>
+	</body>
+</html>
+
+<script>
+
+var setting = ["Raging kegger", "Chem lab", "Prom", "Under the bleachers", "Principal's office", "Fast food joint", "The Beacon", "Math olympics", "The mall", "... "];
+var classmate = ["BMOC", "Poor little rich kid", "Geek", "New kid", "Greaser", "Loser", "Class clown", "Party girl", "Jock", "freak... "];
+var problem = ["Crush", "Dumped", "Parents", "Frenemies", "Grades", "Broke", "Dreams", "Outcast", "Detention", "Freak ability... "];
+var pressure = ["Early curfew", "Email/text to wrong person", "Lost / broke something important", "Crashed car", "Embarrasing parent", "Teacher pressure", "Took stupid dare", "Locker stuck", "All wrong clothes", "... "];
+var plan = ["Masquerade", "Lie", "Pay", "Switch", "Cut", "Cheat", "Quit", "Perform", "Tattle", "Use ability or talent to... "];
+var vulnerability = ["Family", "Student council", "Learning disability", "Bad taste", "Peer pressure", "No license", "Scholarship", "Low self-esteem", "Wrong side of tracks", "Secret... "];
+var otherCharacter = ["Principal", "parent(s)", "James Dean", "Sibling", "Gym teacher", "Graduate", "Janitor", "Counselor", "Exchange student", "Wierd... "];
+var issue = ["Eating disorder", "School bullies", "Hothousing", "Class warfare", "Dating violence", "Substance abuse", "Racism", "Gender", "Mental illness", "Wierd ability ability with... "];
+
+function onGenButton()
+{
+	var output = document.getElementById("output");
+	output.innerHTML = stringGenSituation();
+}
+
+function stringGenSituation()
+{
+	var result = "<table border='1'>";
+	var situation = genSituation();
+	for (var i = 0; i < situation.length; i++)
+	{
+		result += "<tr><th>" + situation[i].name + "</th><td>" + situation[i].value + "</td></tr>";
+	}
+	return result + "</table>";
+}
+
+function genSituation()
+{
+	var result = [];
+	result.push(rollTable("Setting", setting, 2));
+	result.push(rollTable("Classmate", classmate, 1));12
+
+	result.push(rollTable("Problem", problem, 1));
+	result.push(rollTable("Pressure", pressure, 2));
+	result.push(rollTable("Plan", plan, 1));
+	result.push(rollTable("Vulnerability", vulnerability, 1));
+	result.push(rollTable("Other character", otherCharacter, 1));
+	result.push(rollTable("issue", issue, 1));
+	return result;
+}
+
+function rollTable(name, table, repeatCount)
+{
+	var roll = Math.floor(Math.random() * 10);
+	var value = table[roll];
+	if (roll == 9)
+	{
+		for (var i = 0; i < repeatCount; i++)
+		{
+			roll = Math.floor(Math.random() * 10);
+			if (roll == 9)
+			{
+				i--;
+				continue;
+			}
+			if (i != 0)
+			{
+				value += ", ";
+			}
+			value += table[roll];
+		}
+	}
+	return { name: name, value: value };
+}
+
+</script>
