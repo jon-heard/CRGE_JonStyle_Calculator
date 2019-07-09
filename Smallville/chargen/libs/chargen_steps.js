@@ -755,7 +755,7 @@ var _steps = [
 		text: "Enter the comment name and text",
 		post: function(data)
 		{
-			_character.comments[data[0]] = data[1]; 
+			_character.comments[data[0]] = data[1].replaceAll("\\\\n", "<br/>");
 		}
 	},
 	{

@@ -127,7 +127,7 @@ function runNextStep()
 				data = "";
 			}
 			result += "<br/><input id='text_only' oninput='_midFnc(this.value)' value='" + data + "'/>";
-			_getData = function () { return $("#text_only").val(); };
+			_getData = function () { return $("#text_only").val().replaceAll("\\\\n", "<br/>"); };
 			break;
 		case "text2":
 			if (data == null)
@@ -137,7 +137,10 @@ function runNextStep()
 			result += "<br/>";
 			result += "<input id='text3_first'  oninput='_midFnc([ this.value, $(\"#text3_second\").val() ])' value='" + data[0] + "'/>";
 			result += "<input id='text3_second' oninput='_midFnc([ $(\"#text3_first\").val(), this.value ])' value='" + data[1] + "'/>";
-			_getData = function () { return [$("#text3_first").val(), $("#text3_second").val()]; };
+			_getData = function ()
+			{
+				return [$("#text3_first").val().replaceAll("\\\\n", "<br/>"), $("#text3_second").val().replaceAll("\\\\n", "<br/>")];
+			};
 			break;
 		case "text3":
 			if (data == null)
@@ -148,7 +151,7 @@ function runNextStep()
 			result += "<input id='text3_first'  oninput='_midFnc([ this.value, $(\"#text3_second\").val(), $(\"#text3_third\").val() ])' value='" + data[0] + "'/>";
 			result += "<input id='text3_second' oninput='_midFnc([ $(\"#text3_first\").val(), this.value, $(\"#text3_third\").val() ])' value='" + data[1] + "'/>";
 			result += "<input id='text3_third'  oninput='_midFnc([ $(\"#text3_first\").val(), $(\"#text3_second\").val(), this.value ])' value='" + data[2] + "'/>";
-			_getData = function () { return [$("#text3_first").val(), $("#text3_second").val(), $("#text3_third").val()]; };
+			_getData = function () { return [$("#text3_first").val().replaceAll("\\\\n", "<br/>"), $("#text3_second").val().replaceAll("\\\\n", "<br/>"), $("#text3_third").val().replaceAll("\\\\n", "<br/>")]; };
 			break;
 		case "select":
 			if (data == null) { data = []; }
